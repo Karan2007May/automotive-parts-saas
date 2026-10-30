@@ -1,6 +1,6 @@
 {
   "name": "AutoParts Pro SaaS",
-  "description": "Modern B2B Automotive Parts Inventory Management, Intelligent Quoting, and Workshop Operations Platform.",
+  "description": "Modern B2B Automotive Parts Inventory Management, Intelligent Quoting, and Workshop Operations Platform",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
