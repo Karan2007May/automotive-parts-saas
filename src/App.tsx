@@ -25,9 +25,19 @@ import {
   Paperclip,
   RefreshCw,
   FileDown,
-  Printer,
   CheckCircle2,
-  Trash2
+  Trash2,
+  ChevronRight,
+  TrendingUp,
+  Clock,
+  Building2,
+  Phone,
+  ShieldCheck,
+  Layers,
+  SlidersHorizontal,
+  Box,
+  Truck,
+  DollarSign
 } from 'lucide-react';
 
 // Type definitions
@@ -40,6 +50,7 @@ interface Part {
   stock: number;
   price: number;
   location: string;
+  category?: string;
 }
 
 interface Customer {
@@ -93,31 +104,34 @@ interface WorkOrder {
   quoteId?: string;
 }
 
-// Initial Sample Data (Realistic sample rows)
+// Initial Sample Data
 const INITIAL_PARTS: Part[] = [
   {
     id: 'p1',
-    name: 'Brake Pads Front Set',
+    name: 'Brake Pads Front Ceramic Set',
     number: 'BP-4402',
     stock: 48,
     price: 65.0,
     location: 'Shelf A-12',
+    category: 'Braking Systems',
   },
   {
     id: 'p2',
-    name: 'Oil Filter Cartridge',
+    name: 'Oil Filter Cartridge High Flow',
     number: 'OF-1180',
     stock: 120,
     price: 12.5,
     location: 'Bin C-04',
+    category: 'Engine Filtration',
   },
   {
     id: 'p3',
-    name: 'Alternator 120A High Output',
+    name: 'Alternator 120A Heavy Duty',
     number: 'ALT-8921',
     stock: 6,
     price: 210.0,
     location: 'Rack D-01',
+    category: 'Electrical & Charging',
   },
 ];
 
@@ -125,7 +139,7 @@ const INITIAL_CUSTOMERS: Customer[] = [
   {
     id: 'c1',
     name: 'Marcus Vance',
-    company: 'Metro Auto Repair',
+    company: 'Metro Auto Repair Center',
     contact: 'marcus@metroauto.com | (555) 234-5678',
     email: 'marcus@metroauto.com',
     phone: '(555) 234-5678',
@@ -133,7 +147,7 @@ const INITIAL_CUSTOMERS: Customer[] = [
   {
     id: 'c2',
     name: 'Elena Rostova',
-    company: 'Apex Fleet Services',
+    company: 'Apex Fleet Logistics',
     contact: 'e.rostova@apexfleet.io | (555) 876-1234',
     email: 'e.rostova@apexfleet.io',
     phone: '(555) 876-1234',
@@ -141,7 +155,7 @@ const INITIAL_CUSTOMERS: Customer[] = [
   {
     id: 'c3',
     name: 'David Chen',
-    company: 'Downtown Motors',
+    company: 'Downtown Motors & Garage',
     contact: 'dchen@downtownmotors.com | (555) 432-8901',
     email: 'dchen@downtownmotors.com',
     phone: '(555) 432-8901',
@@ -152,16 +166,16 @@ const INITIAL_QUOTES: Quote[] = [
   {
     id: 'Q-101',
     customerId: 'c1',
-    customerName: 'Metro Auto Repair',
+    customerName: 'Metro Auto Repair Center',
     customerEmail: 'marcus@metroauto.com',
     amount: 325.0,
     status: 'Approved',
-    itemsSummary: '5x Brake Pads Front Set',
+    itemsSummary: '5x Brake Pads Front Ceramic Set',
     createdAt: '2026-10-28',
     items: [
       {
         partId: 'p1',
-        partName: 'Brake Pads Front Set',
+        partName: 'Brake Pads Front Ceramic Set',
         partNumber: 'BP-4402',
         quantity: 5,
         unitPrice: 65.0,
@@ -172,16 +186,16 @@ const INITIAL_QUOTES: Quote[] = [
   {
     id: 'Q-102',
     customerId: 'c2',
-    customerName: 'Apex Fleet Services',
+    customerName: 'Apex Fleet Logistics',
     customerEmail: 'e.rostova@apexfleet.io',
     amount: 1260.0,
     status: 'Pending',
-    itemsSummary: '6x Alternator 120A High Output',
+    itemsSummary: '6x Alternator 120A Heavy Duty',
     createdAt: '2026-10-29',
     items: [
       {
         partId: 'p3',
-        partName: 'Alternator 120A High Output',
+        partName: 'Alternator 120A Heavy Duty',
         partNumber: 'ALT-8921',
         quantity: 6,
         unitPrice: 210.0,
@@ -192,16 +206,16 @@ const INITIAL_QUOTES: Quote[] = [
   {
     id: 'Q-103',
     customerId: 'c3',
-    customerName: 'Downtown Motors',
+    customerName: 'Downtown Motors & Garage',
     customerEmail: 'dchen@downtownmotors.com',
     amount: 150.0,
     status: 'Draft',
-    itemsSummary: '12x Oil Filter Cartridge',
-    createdAt: '2026-10-29',
+    itemsSummary: '12x Oil Filter Cartridge High Flow',
+    createdAt: '2026-10-30',
     items: [
       {
         partId: 'p2',
-        partName: 'Oil Filter Cartridge',
+        partName: 'Oil Filter Cartridge High Flow',
         partNumber: 'OF-1180',
         quantity: 12,
         unitPrice: 12.5,
@@ -215,25 +229,25 @@ const INITIAL_WORK_ORDERS: WorkOrder[] = [
   {
     id: 'WO-501',
     customerId: 'c1',
-    customerName: 'Metro Auto Repair',
+    customerName: 'Metro Auto Repair Center',
     status: 'In Progress',
     dispatchStatus: 'Ready for Pickup',
-    partsSummary: '5x Brake Pads Front Set (BP-4402)',
+    partsSummary: '5x Brake Pads Front Ceramic Set (BP-4402)',
     quoteId: 'Q-101',
   },
   {
     id: 'WO-502',
     customerId: 'c2',
-    customerName: 'Apex Fleet Services',
+    customerName: 'Apex Fleet Logistics',
     status: 'Pending',
     dispatchStatus: 'Awaiting Dispatch',
-    partsSummary: '6x Alternator 120A (ALT-8921)',
+    partsSummary: '6x Alternator 120A Heavy Duty (ALT-8921)',
     quoteId: 'Q-102',
   },
   {
     id: 'WO-503',
     customerId: 'c3',
-    customerName: 'Downtown Motors',
+    customerName: 'Downtown Motors & Garage',
     status: 'Completed',
     dispatchStatus: 'Dispatched',
     partsSummary: '12x Oil Filter Cartridge (OF-1180)',
@@ -296,6 +310,7 @@ export default function App() {
       stock: parseInt(newPartStock, 10) || 0,
       price: parseFloat(newPartPrice) || 0,
       location: newPartLocation.trim() || 'Unassigned',
+      category: 'General Replacement',
     };
 
     setParts((prev) => [newPart, ...prev]);
@@ -387,13 +402,12 @@ export default function App() {
     const quoteData = constructQuoteData();
     setQuoteGeneratingNotice(true);
 
-    // Provide immediate responsive feel with a fast wireframe generation tick
     setTimeout(() => {
       setQuoteGeneratingNotice(false);
       setActiveGeneratedQuote(quoteData);
       setIsCreateQuoteModalOpen(false);
       setIsQuotePreviewModalOpen(true);
-    }, 250);
+    }, 280);
   };
 
   // Save standard quote manually
@@ -432,7 +446,7 @@ export default function App() {
     });
   };
 
-  // AI Feature 1 Action: Download Real PDF
+  // AI Feature 1 Action: Download Real PDF via jsPDF
   const handleDownloadPDF = (quoteData: GeneratedQuoteData) => {
     try {
       const doc = new jsPDF({
@@ -443,166 +457,164 @@ export default function App() {
 
       const pageWidth = doc.internal.pageSize.getWidth();
 
-      // Top Header / Company Wireframe Branding
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(14);
-      doc.setTextColor(20, 20, 20);
-      doc.text('AUTO-PARTS DISTRIBUTION CO.', 40, 52);
+      // Top Header / Enterprise Branding
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(15, 23, 42); // slate-900
+      doc.text('AUTOPARTS PRO B2B SAAS', 40, 50);
 
-      doc.setFont('courier', 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
-      doc.setTextColor(90, 90, 90);
-      doc.text('100 Industrial Parkway, Warehouse Bay 4', 40, 67);
-      doc.text('Phone: (555) 019-2830 | quotes@autopartssaas.demo', 40, 79);
-      doc.text('Commercial Sales Division • Tax ID: US-8829-1092', 40, 91);
+      doc.setTextColor(100, 116, 139); // slate-500
+      doc.text('100 Industrial Parkway, Logistics Hub • (555) 019-2830', 40, 65);
+      doc.text('support@autopartspro.io • Tax Exempt B2B ID: US-8829-1092', 40, 77);
 
       // Quote Identifier Box (Top Right)
-      doc.setDrawColor(40, 40, 40);
-      doc.setLineWidth(1);
-      doc.rect(pageWidth - 210, 38, 170, 64);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(pageWidth - 210, 36, 170, 60, 4, 4, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(pageWidth - 210, 36, 170, 60, 4, 4, 'S');
 
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(9);
-      doc.setTextColor(80, 80, 80);
-      doc.text('OFFICIAL QUOTATION', pageWidth - 200, 53);
-      doc.setFontSize(13);
-      doc.setTextColor(0, 0, 0);
-      doc.text(quoteData.quoteId, pageWidth - 200, 70);
-
-      doc.setFont('courier', 'normal');
+      doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
-      doc.setTextColor(80, 80, 80);
-      doc.text(`Date  : ${quoteData.date}`, pageWidth - 200, 84);
-      doc.text(`Valid : ${quoteData.validUntil}`, pageWidth - 200, 94);
+      doc.setTextColor(71, 85, 105);
+      doc.text('OFFICIAL QUOTATION', pageWidth - 198, 50);
 
-      // Horizontal Divider
-      doc.setDrawColor(40, 40, 40);
-      doc.setLineWidth(1.5);
-      doc.line(40, 118, pageWidth - 40, 118);
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text(quoteData.quoteId, pageWidth - 198, 66);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Issue Date: ${quoteData.date}`, pageWidth - 198, 78);
+      doc.text(`Valid Until: ${quoteData.validUntil}`, pageWidth - 198, 88);
+
+      // Divider line
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(1);
+      doc.line(40, 108, pageWidth - 40, 108);
 
       // Customer Details Box
-      doc.setFillColor(245, 245, 245);
-      doc.rect(40, 128, pageWidth - 80, 68, 'F');
-      doc.setDrawColor(180, 180, 180);
-      doc.setLineWidth(0.8);
-      doc.rect(40, 128, pageWidth - 80, 68);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(40, 118, pageWidth - 80, 64, 4, 4, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(40, 118, pageWidth - 80, 64, 4, 4, 'S');
 
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(80, 80, 80);
-      doc.text('PREPARED FOR (CUSTOMER DETAILS):', 52, 143);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text('PREPARED FOR (CLIENT):', 52, 132);
 
       doc.setFontSize(11);
-      doc.setTextColor(15, 15, 15);
-      doc.text(quoteData.customer.company, 52, 159);
+      doc.setTextColor(15, 23, 42);
+      doc.text(quoteData.customer.company, 52, 147);
 
-      doc.setFont('courier', 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
-      doc.setTextColor(60, 60, 60);
-      doc.text(`Attention : ${quoteData.customer.name}`, 52, 172);
-      doc.text(`Email     : ${quoteData.customer.email}`, 52, 184);
+      doc.setTextColor(71, 85, 105);
+      doc.text(`Attention: ${quoteData.customer.name}`, 52, 160);
+      doc.text(`Email: ${quoteData.customer.email}  |  Phone: ${quoteData.customer.phone}`, 52, 172);
 
-      // Commercial Terms (Right column in customer block)
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(80, 80, 80);
-      doc.text('QUOTATION TERMS:', 320, 143);
-
-      doc.setFont('courier', 'normal');
+      // Terms column
+      doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
-      doc.setTextColor(60, 60, 60);
-      doc.text('• Payment: Net 30 days upon receipt', 320, 157);
-      doc.text('• Dispatch: 24-48 business hours', 320, 170);
-      doc.text('• Warranty: 12-Month OEM guarantee', 320, 183);
+      doc.setTextColor(100, 116, 139);
+      doc.text('COMMERCIAL TERMS:', 330, 132);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text('• Net 30 days upon shop receipt', 330, 145);
+      doc.text('• 24-48h warehouse dispatch turnaround', 330, 157);
+      doc.text('• 12-Month replacement OEM warranty', 330, 169);
 
       // Table Header
-      const tableY = 212;
-      doc.setFillColor(225, 225, 225);
+      const tableY = 196;
+      doc.setFillColor(241, 245, 249);
       doc.rect(40, tableY, pageWidth - 80, 22, 'F');
-      doc.setDrawColor(50, 50, 50);
-      doc.rect(40, tableY, pageWidth - 80, 22);
+      doc.setDrawColor(226, 232, 240);
+      doc.line(40, tableY + 22, pageWidth - 40, tableY + 22);
 
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(0, 0, 0);
-      doc.text('#', 48, tableY + 15);
-      doc.text('PARTS DESCRIPTION', 72, tableY + 15);
-      doc.text('PART NUMBER', 270, tableY + 15);
-      doc.text('QTY', 375, tableY + 15, { align: 'right' });
-      doc.text('UNIT PRICE', 455, tableY + 15, { align: 'right' });
-      doc.text('TOTAL', pageWidth - 50, tableY + 15, { align: 'right' });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text('#', 48, tableY + 14);
+      doc.text('PARTS DESCRIPTION', 72, tableY + 14);
+      doc.text('PART NUMBER', 265, tableY + 14);
+      doc.text('QTY', 375, tableY + 14, { align: 'right' });
+      doc.text('UNIT PRICE', 455, tableY + 14, { align: 'right' });
+      doc.text('AMOUNT', pageWidth - 50, tableY + 14, { align: 'right' });
 
       // Table Line Items
       let curY = tableY + 22;
-      doc.setFont('courier', 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
 
       quoteData.items.forEach((item, idx) => {
         const rowHeight = 22;
-        doc.setDrawColor(210, 210, 210);
-        doc.rect(40, curY, pageWidth - 80, rowHeight);
+        doc.setDrawColor(241, 245, 249);
+        doc.line(40, curY + rowHeight, pageWidth - 40, curY + rowHeight);
 
-        doc.setTextColor(110, 110, 110);
+        doc.setTextColor(148, 163, 184);
         doc.text(String(idx + 1), 48, curY + 15);
 
-        doc.setFont('courier', 'bold');
-        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(15, 23, 42);
         doc.text(item.partName, 72, curY + 15);
 
-        doc.setFont('courier', 'normal');
-        doc.setTextColor(60, 60, 60);
-        doc.text(item.partNumber, 270, curY + 15);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 116, 139);
+        doc.text(item.partNumber, 265, curY + 15);
 
+        doc.setTextColor(15, 23, 42);
         doc.text(String(item.quantity), 375, curY + 15, { align: 'right' });
         doc.text(`$${item.unitPrice.toFixed(2)}`, 455, curY + 15, { align: 'right' });
 
-        doc.setFont('courier', 'bold');
-        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'bold');
         doc.text(`$${item.total.toFixed(2)}`, pageWidth - 50, curY + 15, { align: 'right' });
 
         curY += rowHeight;
       });
 
-      // Summary Totals Box
-      const summaryBoxY = curY + 18;
-      const summaryBoxWidth = 205;
+      // Summary Totals Card
+      const summaryBoxY = curY + 16;
+      const summaryBoxWidth = 200;
       const summaryBoxX = pageWidth - 40 - summaryBoxWidth;
 
-      doc.setFillColor(248, 248, 248);
-      doc.rect(summaryBoxX, summaryBoxY, summaryBoxWidth, 68, 'F');
-      doc.setDrawColor(60, 60, 60);
-      doc.rect(summaryBoxX, summaryBoxY, summaryBoxWidth, 68);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(summaryBoxX, summaryBoxY, summaryBoxWidth, 68, 4, 4, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(summaryBoxX, summaryBoxY, summaryBoxWidth, 68, 4, 4, 'S');
 
-      doc.setFont('courier', 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
-      doc.setTextColor(80, 80, 80);
+      doc.setTextColor(100, 116, 139);
       doc.text('Subtotal:', summaryBoxX + 12, summaryBoxY + 18);
       doc.text(`$${quoteData.subtotal.toFixed(2)}`, summaryBoxX + summaryBoxWidth - 12, summaryBoxY + 18, { align: 'right' });
 
-      doc.text('Tax (0% B2B Trade):', summaryBoxX + 12, summaryBoxY + 34);
+      doc.text('Tax (0% B2B Wholesale):', summaryBoxX + 12, summaryBoxY + 34);
       doc.text(`$${quoteData.tax.toFixed(2)}`, summaryBoxX + summaryBoxWidth - 12, summaryBoxY + 34, { align: 'right' });
 
-      doc.setDrawColor(180, 180, 180);
+      doc.setDrawColor(226, 232, 240);
       doc.line(summaryBoxX + 8, summaryBoxY + 42, summaryBoxX + summaryBoxWidth - 8, summaryBoxY + 42);
 
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(10.5);
-      doc.setTextColor(0, 0, 0);
-      doc.text('TOTAL AMOUNT:', summaryBoxX + 12, summaryBoxY + 58);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(15, 23, 42);
+      doc.text('Total Amount:', summaryBoxX + 12, summaryBoxY + 58);
       doc.text(`$${quoteData.total.toFixed(2)}`, summaryBoxX + summaryBoxWidth - 12, summaryBoxY + 58, { align: 'right' });
 
       // Footer
       const footerY = 760;
-      doc.setDrawColor(180, 180, 180);
+      doc.setDrawColor(226, 232, 240);
       doc.line(40, footerY, pageWidth - 40, footerY);
 
-      doc.setFont('courier', 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(120, 120, 120);
-      doc.text('Generated via AutoParts SaaS AI Quotation Engine • Official Commercial Estimate', 40, footerY + 16);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text('Generated by AutoParts Pro SaaS • Official Commercial B2B Quotation Document', 40, footerY + 16);
       doc.text('Page 1 of 1', pageWidth - 40, footerY + 16, { align: 'right' });
 
-      // Save real PDF file to client's browser
       doc.save(`Quotation_${quoteData.quoteId}.pdf`);
 
       setPdfDownloadedNotice(`Quotation_${quoteData.quoteId}.pdf downloaded successfully.`);
@@ -627,55 +639,58 @@ export default function App() {
     variation: number
   ) => {
     const firstName = customer.name.split(' ')[0] || customer.name;
-    const subject = `Quotation for Your Automotive Parts Requirement`;
+    const subject = `Quotation for Your Automotive Parts Requirement - ${quoteId}`;
 
     let customNote = '';
     if (instruction.trim()) {
-      customNote = `\n\nNote: ${instruction.trim()}`;
+      customNote = `\n\nSpecial Note: ${instruction.trim()}`;
     }
 
     const drafts = [
-      // Draft 1 (Exact style from user specification)
+      // Draft 1 (Standard professional)
       `Subject: ${subject}
 
 Hello ${firstName},
 
 Thank you for your enquiry.
 
-Please find attached the quotation for the requested automotive parts. The quotation includes the available parts, quantities, and pricing details.${customNote}
+Please find attached the quotation (${quoteId}) for the requested automotive parts. The quotation includes the available parts, quantities, and pricing details (Total: $${total.toFixed(2)}).${customNote}
 
 Please review it and let us know if you would like to proceed with the order.
 
 Best regards,
-Sales Team`,
+Sales Operations Team
+AutoParts Pro Logistics`,
 
       // Draft 2 (Volume discount / fast dispatch variation)
-      `Subject: Quotation ${quoteId}: Automotive Parts Estimate for ${customer.company}
+      `Subject: ${subject} • Ready for Workshop Review
 
 Dear ${firstName},
 
-Thank you for contacting us regarding parts fulfillment for ${customer.company}.
+Following up on your parts request for ${customer.company}. We have prepared quotation ${quoteId} with current warehouse stock availability and pricing.
 
-Attached is our official quotation (${quoteId}) totaling $${total.toFixed(2)}. All requested components have been verified against current warehouse stock and are reserved for your confirmation.${customNote}
+The detailed quotation is attached as a PDF for your convenience.${customNote}
 
-Please review the attached PDF breakdown and reply to this email to convert this into a work order.
+We can dispatch these parts immediately upon your confirmation. Please let us know if you have any questions or require adjustments.
 
 Best regards,
-Sales & Operations Team`,
+Commercial Accounts Team
+AutoParts Pro Logistics`,
 
       // Draft 3 (Short & direct commercial variation)
-      `Subject: Automotive Parts Quotation (${quoteId})
+      `Subject: Automotive Parts Estimate Summary (${quoteId})
 
 Hi ${firstName},
 
-Following up on your parts request. Please find attached quotation ${quoteId} prepared for ${customer.company}.
+Please find attached quotation ${quoteId} totaling $${total.toFixed(2)} prepared for ${customer.company}.
 
-All items are in stock and ready for immediate shop dispatch upon your approval.${customNote}
+All listed components have been verified in our inventory and are reserved for your confirmation.${customNote}
 
-Feel free to reach out if you have any questions or require revisions.
+Feel free to reply directly to convert this estimate into an active shop work order.
 
-Best regards,
-Commercial Accounts Team`,
+Warm regards,
+Client Relations
+AutoParts Pro Logistics`,
     ];
 
     return {
@@ -686,9 +701,7 @@ Commercial Accounts Team`,
 
   // Open "Draft Email with AI" from Preview or Table
   const handleOpenDraftEmail = (quoteData: GeneratedQuoteData) => {
-    // Ensure quote is persisted
     saveQuoteToState(quoteData, 'Pending');
-
     setActiveGeneratedQuote(quoteData);
     setAttachedQuoteId(quoteData.quoteId);
     setEmailTo(quoteData.customer.email);
@@ -723,7 +736,7 @@ Commercial Accounts Team`,
       date: q.createdAt,
       validUntil: '30 Days',
       customer,
-      items: q.items || [
+      items: q.items && q.items.length > 0 ? q.items : [
         {
           partId: 'p1',
           partName: q.itemsSummary,
@@ -809,7 +822,6 @@ Commercial Accounts Team`,
   const handleSendEmail = () => {
     if (!activeGeneratedQuote) return;
 
-    // Update quote status to Pending or Approved
     setQuotes((prev) =>
       prev.map((q) =>
         q.id === activeGeneratedQuote.quoteId ? { ...q, status: 'Approved' } : q
@@ -821,7 +833,7 @@ Commercial Accounts Team`,
 
     setIsEmailModalOpen(false);
     setEmailSentNotice(
-      `Email successfully dispatched to ${recipient} with Quotation_${qId}.pdf attached!`
+      `Email dispatched to ${recipient} with Quotation_${qId}.pdf attached.`
     );
     setCurrentScreen('quotes');
 
@@ -860,187 +872,224 @@ Commercial Accounts Team`,
     (p) =>
       p.name.toLowerCase().includes(inventorySearch.toLowerCase()) ||
       p.number.toLowerCase().includes(inventorySearch.toLowerCase()) ||
-      p.location.toLowerCase().includes(inventorySearch.toLowerCase())
+      p.location.toLowerCase().includes(inventorySearch.toLowerCase()) ||
+      (p.category && p.category.toLowerCase().includes(inventorySearch.toLowerCase()))
   );
 
   // Workflow steps for the prototype helper banner
   const workflowSteps = [
-    { id: 'dashboard', label: '1. Dashboard' },
-    { id: 'inventory', label: '2. Inventory' },
-    { id: 'quotes', label: '3. Quotes & AI' },
-    { id: 'work-orders', label: '4. Work Orders' },
+    { id: 'dashboard', label: 'Dashboard', step: '01' },
+    { id: 'inventory', label: 'Inventory', step: '02' },
+    { id: 'quotes', label: 'Quotes & AI', step: '03' },
+    { id: 'work-orders', label: 'Work Orders', step: '04' },
   ];
 
   return (
-    <div className="flex h-screen w-screen bg-zinc-100 text-zinc-900 font-mono select-none overflow-hidden">
-      {/* LEFT SIDEBAR NAVIGATION */}
-      <aside className="w-64 flex-shrink-0 bg-zinc-200 border-r border-zinc-400 flex flex-col justify-between">
-        <div>
-          {/* Logo / Brand Header Wireframe */}
-          <div className="p-4 border-b border-zinc-400 bg-zinc-300">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 border-2 border-zinc-800 bg-white flex items-center justify-center font-bold text-xs">
-                A
+    <div className="flex h-screen w-screen bg-slate-50 text-slate-900 font-sans antialiased overflow-hidden">
+      {/* SLEEK MODERN DARK NAVY SIDEBAR */}
+      <aside className="w-64 flex-shrink-0 bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col justify-between">
+        <div className="flex flex-col">
+          {/* Brand Header */}
+          <div className="h-16 px-5 border-b border-slate-800/80 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm font-bold text-sm tracking-wider">
+                AP
               </div>
               <div>
-                <div className="font-bold text-sm tracking-tight text-zinc-900 leading-none">
-                  AUTO-PARTS SAAS
+                <div className="font-semibold text-sm tracking-tight text-white flex items-center gap-1.5">
+                  <span>AutoParts Pro</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                    B2B
+                  </span>
                 </div>
-                <div className="text-[10px] text-zinc-600 mt-1 uppercase tracking-wider">
-                  Concept Wireframe
-                </div>
+                <div className="text-[11px] text-slate-400">Inventory & Quoting OS</div>
               </div>
             </div>
           </div>
 
-          {/* Navigation Links */}
+          {/* Navigation Items */}
           <nav className="p-3 space-y-1">
-            <div className="text-[10px] uppercase font-bold text-zinc-500 px-3 py-1 tracking-wider">
-              Navigation
+            <div className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              Core Modules
             </div>
 
             <button
               onClick={() => setCurrentScreen('dashboard')}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-left text-xs font-semibold border ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 currentScreen === 'dashboard'
-                  ? 'bg-zinc-900 text-white border-zinc-900'
-                  : 'bg-zinc-100 text-zinc-800 border-zinc-300 hover:bg-zinc-50'
+                  ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
-              <LayoutDashboard size={14} />
-              <span>1. Dashboard</span>
+              <div className="flex items-center gap-3">
+                <LayoutDashboard size={16} />
+                <span>Dashboard</span>
+              </div>
             </button>
 
             <button
               onClick={() => setCurrentScreen('inventory')}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-left text-xs font-semibold border ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 currentScreen === 'inventory'
-                  ? 'bg-zinc-900 text-white border-zinc-900'
-                  : 'bg-zinc-100 text-zinc-800 border-zinc-300 hover:bg-zinc-50'
+                  ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
-              <Package size={14} />
-              <span>2. Inventory</span>
+              <div className="flex items-center gap-3">
+                <Package size={16} />
+                <span>Inventory</span>
+              </div>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-medium ${
+                currentScreen === 'inventory' ? 'bg-blue-700 text-white' : 'bg-slate-800 text-slate-400'
+              }`}>
+                {parts.length}
+              </span>
             </button>
 
             <button
               onClick={() => setCurrentScreen('customers')}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-left text-xs font-semibold border ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 currentScreen === 'customers'
-                  ? 'bg-zinc-900 text-white border-zinc-900'
-                  : 'bg-zinc-100 text-zinc-800 border-zinc-300 hover:bg-zinc-50'
+                  ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
-              <Users size={14} />
-              <span>3. Customers</span>
+              <div className="flex items-center gap-3">
+                <Users size={16} />
+                <span>Customers</span>
+              </div>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-medium ${
+                currentScreen === 'customers' ? 'bg-blue-700 text-white' : 'bg-slate-800 text-slate-400'
+              }`}>
+                {customers.length}
+              </span>
             </button>
 
             <button
               onClick={() => setCurrentScreen('quotes')}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-left text-xs font-semibold border ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 currentScreen === 'quotes'
-                  ? 'bg-zinc-900 text-white border-zinc-900'
-                  : 'bg-zinc-100 text-zinc-800 border-zinc-300 hover:bg-zinc-50'
+                  ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
-              <FileText size={14} />
-              <div className="flex items-center justify-between flex-1">
-                <span>4. Quotes</span>
-                <span className="text-[9px] bg-zinc-300 px-1 border border-zinc-500 font-bold">
-                  AI
-                </span>
+              <div className="flex items-center gap-3">
+                <FileText size={16} />
+                <span>Quotes</span>
               </div>
+              <span className="flex items-center gap-1">
+                <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 px-1.5 py-0.5 rounded font-semibold flex items-center gap-0.5">
+                  <Sparkles size={9} /> AI
+                </span>
+              </span>
             </button>
 
             <button
               onClick={() => setCurrentScreen('work-orders')}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-left text-xs font-semibold border ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 currentScreen === 'work-orders'
-                  ? 'bg-zinc-900 text-white border-zinc-900'
-                  : 'bg-zinc-100 text-zinc-800 border-zinc-300 hover:bg-zinc-50'
+                  ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
-              <ClipboardList size={14} />
-              <span>5. Work Orders</span>
+              <div className="flex items-center gap-3">
+                <ClipboardList size={16} />
+                <span>Work Orders</span>
+              </div>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-medium ${
+                currentScreen === 'work-orders' ? 'bg-blue-700 text-white' : 'bg-slate-800 text-slate-400'
+              }`}>
+                {workOrders.filter(w => w.status !== 'Completed').length} active
+              </span>
             </button>
           </nav>
 
-          {/* Prototype Flow Shortcut Box */}
-          <div className="mx-3 mt-3 p-3 bg-zinc-100 border border-zinc-400 text-xs">
-            <div className="font-bold text-[11px] uppercase tracking-wider text-zinc-700 mb-1 border-b border-zinc-300 pb-1 flex items-center justify-between">
-              <span>AI Prototype Flow</span>
-              <Sparkles size={11} className="text-zinc-600" />
+          {/* Connected Lifecycle Stepper Card */}
+          <div className="mx-3 mt-3 p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs">
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-700/50">
+              <span className="text-[11px] font-semibold text-slate-200 flex items-center gap-1.5">
+                <Sparkles size={12} className="text-blue-400" />
+                <span>Workflow Pipeline</span>
+              </span>
+              <span className="text-[10px] text-blue-400 font-medium">B2B</span>
             </div>
-            <p className="text-[10px] text-zinc-600 leading-relaxed mb-2">
-              Demonstration walkthrough:
-            </p>
-            <div className="space-y-1 text-[10px]">
-              <div className="flex items-center gap-1 text-zinc-700">
-                <span className="font-bold">1.</span> Select Parts in Inventory
+            <div className="space-y-1.5 text-[11px] text-slate-300">
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[9px] font-bold">1</span>
+                <span>Inventory Part Selection</span>
               </div>
-              <div className="flex items-center gap-1 text-zinc-700 font-bold">
-                <span className="font-bold">2.</span> Generate Quote with AI
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/40 flex items-center justify-center text-[9px] font-bold">2</span>
+                <span>AI Quote & Real PDF</span>
               </div>
-              <div className="flex items-center gap-1 text-zinc-700">
-                <span className="font-bold">3.</span> Preview & Download PDF
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/40 flex items-center justify-center text-[9px] font-bold">3</span>
+                <span>AI Email Dispatch</span>
               </div>
-              <div className="flex items-center gap-1 text-zinc-700 font-bold">
-                <span className="font-bold">4.</span> Draft Email with AI
-              </div>
-              <div className="flex items-center gap-1 text-zinc-700">
-                <span className="font-bold">5.</span> Send & Create Work Order
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[9px] font-bold">4</span>
+                <span>Shop Order Fulfillment</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Sidebar Footer */}
-        <div className="p-3 border-t border-zinc-400 bg-zinc-300 text-[10px] text-zinc-600 flex items-center justify-between">
-          <span>Client Demo v0.2 [AI]</span>
-          <button
-            onClick={handleResetData}
-            title="Reset to default prototype sample data"
-            className="flex items-center gap-1 hover:text-zinc-900 text-zinc-700 underline"
-          >
-            <RotateCcw size={10} /> Reset
-          </button>
+        {/* User Profile & Demo Controls */}
+        <div className="p-3 border-t border-slate-800 bg-slate-900/90">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-800/50 border border-slate-700/40">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white font-semibold flex items-center justify-center text-xs shadow-inner">
+                MV
+              </div>
+              <div className="leading-tight">
+                <div className="text-xs font-semibold text-white">Marcus Vance</div>
+                <div className="text-[10px] text-slate-400">Head of Operations</div>
+              </div>
+            </div>
+            <button
+              onClick={handleResetData}
+              title="Reset sample data"
+              className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700/60 transition-colors"
+            >
+              <RotateCcw size={13} />
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* TOP PROTOTYPE BAR */}
-        <header className="h-12 bg-white border-b border-zinc-400 px-6 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <span className="px-2 py-0.5 border border-zinc-800 text-[10px] font-bold uppercase tracking-wider bg-zinc-100 flex items-center gap-1">
-              <Sparkles size={11} /> AI-Powered Prototype
-            </span>
-            <span className="text-xs text-zinc-500">|</span>
-            <div className="flex items-center gap-1 text-xs text-zinc-600">
-              <span className="font-semibold text-zinc-900 uppercase">Screen:</span>
-              <span className="capitalize">{currentScreen.replace('-', ' ')}</span>
+      {/* MAIN VIEWPORT */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+        {/* TOP ENTERPRISE HEADER */}
+        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between flex-shrink-0 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-slate-500">
+              <span className="font-semibold text-slate-900 capitalize text-base tracking-tight">
+                {currentScreen.replace('-', ' ')}
+              </span>
+              <span>/</span>
+              <span className="text-xs font-medium text-slate-500">Commercial Portal</span>
             </div>
           </div>
 
-          {/* Prototype Flow Stepper Controls */}
-          <div className="flex items-center gap-1 text-xs bg-zinc-100 border border-zinc-300 px-2 py-1">
-            <span className="text-[10px] uppercase font-bold text-zinc-500 mr-1">Demo Flow:</span>
+          {/* Stepper Interactive Navigation */}
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-lg border border-slate-200">
             {workflowSteps.map((step, idx) => {
               const isActive = currentScreen === step.id;
               return (
                 <React.Fragment key={step.id}>
                   <button
                     onClick={() => setCurrentScreen(step.id as Screen)}
-                    className={`px-2 py-0.5 text-[11px] font-medium transition-colors ${
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
                       isActive
-                        ? 'bg-zinc-900 text-white font-bold'
-                        : 'text-zinc-700 hover:bg-zinc-200'
+                        ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                     }`}
                   >
-                    {step.label}
+                    <span className="text-[10px] text-slate-400 font-mono">{step.step}</span>
+                    <span>{step.label}</span>
                   </button>
                   {idx < workflowSteps.length - 1 && (
-                    <span className="text-zinc-400 text-[10px]">→</span>
+                    <ChevronRight size={12} className="text-slate-400" />
                   )}
                 </React.Fragment>
               );
@@ -1048,233 +1097,283 @@ Commercial Accounts Team`,
           </div>
         </header>
 
-        {/* NOTIFICATION BANNERS */}
+        {/* FEEDBACK TOAST / NOTIFICATION BANNERS */}
         {emailSentNotice && (
-          <div className="bg-zinc-900 text-white px-6 py-2 border-b border-black text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={14} className="text-zinc-300" />
-              <span>{emailSentNotice}</span>
+          <div className="bg-slate-900 text-white px-8 py-3 border-b border-slate-800 text-xs flex items-center justify-between shadow-md animate-in fade-in duration-200">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 size={16} className="text-emerald-400" />
+              <span className="font-medium">{emailSentNotice}</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => setCurrentScreen('work-orders')}
-                className="underline text-[11px] font-bold hover:text-zinc-300"
+                className="text-xs font-semibold text-blue-400 hover:text-blue-300 underline"
               >
-                Proceed to Work Orders →
+                Track in Work Orders →
               </button>
               <button
                 onClick={() => setEmailSentNotice(null)}
-                className="text-zinc-400 hover:text-white"
+                className="text-slate-400 hover:text-white p-0.5"
               >
-                <X size={12} />
+                <X size={14} />
               </button>
             </div>
           </div>
         )}
 
         {pdfDownloadedNotice && (
-          <div className="bg-zinc-200 text-zinc-900 px-6 py-2 border-b border-zinc-400 text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileDown size={14} className="text-zinc-700" />
-              <span>{pdfDownloadedNotice}</span>
+          <div className="bg-emerald-50 text-emerald-900 px-8 py-2.5 border-b border-emerald-200 text-xs flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-2.5">
+              <FileDown size={15} className="text-emerald-700" />
+              <span className="font-medium">{pdfDownloadedNotice}</span>
             </div>
             <button
               onClick={() => setPdfDownloadedNotice(null)}
-              className="text-zinc-500 hover:text-zinc-900"
+              className="text-emerald-700 hover:text-emerald-900 p-0.5"
             >
-              <X size={12} />
+              <X size={13} />
             </button>
           </div>
         )}
 
-        {/* WORKSPACE VIEWPORT */}
-        <main className="flex-1 overflow-y-auto p-6 bg-zinc-100">
+        {/* WORKSPACE CONTENT */}
+        <main className="flex-1 overflow-y-auto p-8">
           {/* SCREEN 1: DASHBOARD */}
           {currentScreen === 'dashboard' && (
-            <div className="max-w-5xl mx-auto space-y-6">
-              {/* Screen Header */}
-              <div className="border-b border-zinc-300 pb-3 flex items-center justify-between">
+            <div className="max-w-6xl mx-auto space-y-6">
+              {/* Header Title & Primary Action */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
                 <div>
-                  <h1 className="text-lg font-bold uppercase tracking-wider text-zinc-900">
-                    Dashboard
+                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                    Operations Overview
                   </h1>
-                  <p className="text-xs text-zinc-600 mt-0.5">
-                    Platform overview: Parts inventory, active quotations, and open shop orders.
+                  <p className="text-xs text-slate-500 mt-1">
+                    Live catalog telemetry, active quotation pipelines, and dispatch fulfillment status.
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => {
                       setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                       setIsCreateQuoteModalOpen(true);
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-semibold hover:bg-zinc-800"
+                    className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium shadow-sm transition-all"
                   >
-                    <Sparkles size={13} />
+                    <Sparkles size={14} className="text-blue-200" />
                     <span>Create Quote with AI</span>
                   </button>
                   <button
                     onClick={() => setCurrentScreen('inventory')}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-white text-zinc-800 border border-zinc-400 text-xs font-semibold hover:bg-zinc-50"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-sm transition-all"
                   >
-                    <span>Go to Inventory</span>
-                    <ArrowRight size={13} />
+                    <span>Browse Inventory</span>
+                    <ArrowRight size={13} className="text-slate-400" />
                   </button>
                 </div>
               </div>
 
-              {/* 3 SUMMARY CARDS (Total Parts, Pending Quotes, Open Orders) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Summary Card 1: Total Parts */}
-                <div className="p-4 bg-white border border-zinc-400">
-                  <div className="flex items-center justify-between border-b border-zinc-200 pb-2 mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-600">
-                      Total Parts
+              {/* Modern Summary Metric Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* Metric 1: Total Parts */}
+                <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm hover:border-slate-300 transition-all">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-500">Total Cataloged Parts</span>
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <Package size={16} />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-baseline gap-2">
+                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                      {parts.length}
                     </span>
-                    <Package size={16} className="text-zinc-500" />
+                    <span className="text-xs font-medium text-emerald-600 flex items-center gap-0.5">
+                      <TrendingUp size={12} /> +12% active
+                    </span>
                   </div>
-                  <div className="text-3xl font-bold tracking-tight text-zinc-900">
-                    {parts.length}
+                  <div className="text-xs text-slate-500 mt-1">
+                    {parts.reduce((acc, p) => acc + p.stock, 0)} total units across warehouse bays
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1">
-                    {parts.reduce((acc, p) => acc + p.stock, 0)} total units in inventory
-                  </div>
-                  <div className="mt-3 pt-2 border-t border-zinc-200 flex justify-between items-center text-[10px]">
-                    <span className="text-zinc-500">Active SKUs cataloged</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span className="text-slate-400">All SKUs in stock</span>
                     <button
                       onClick={() => setCurrentScreen('inventory')}
-                      className="underline text-zinc-800 font-bold hover:text-black"
+                      className="text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1"
                     >
-                      View Table →
+                      Manage items <ChevronRight size={13} />
                     </button>
                   </div>
                 </div>
 
-                {/* Summary Card 2: Pending Quotes */}
-                <div className="p-4 bg-white border border-zinc-400">
-                  <div className="flex items-center justify-between border-b border-zinc-200 pb-2 mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-600">
-                      Pending Quotes
+                {/* Metric 2: Pending Quotes */}
+                <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm hover:border-slate-300 transition-all">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-500">Pending Quotations</span>
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                      <FileText size={16} />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-baseline gap-2">
+                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                      {quotes.filter((q) => q.status === 'Pending').length || 1}
                     </span>
-                    <FileText size={16} className="text-zinc-500" />
+                    <span className="text-xs font-medium text-slate-500">
+                      of {quotes.length} total
+                    </span>
                   </div>
-                  <div className="text-3xl font-bold tracking-tight text-zinc-900">
-                    {quotes.filter((q) => q.status === 'Pending').length || 1}
-                  </div>
-                  <div className="text-[11px] text-zinc-500 mt-1">
+                  <div className="text-xs text-slate-500 mt-1 font-mono">
                     ${quotes
                       .reduce((acc, q) => acc + q.amount, 0)
                       .toLocaleString('en-US', { minimumFractionDigits: 2 })}{' '}
                     total pipeline value
                   </div>
-                  <div className="mt-3 pt-2 border-t border-zinc-200 flex justify-between items-center text-[10px]">
-                    <span className="text-zinc-500">{quotes.length} quotations active</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span className="text-slate-400">AI email drafting ready</span>
                     <button
                       onClick={() => setCurrentScreen('quotes')}
-                      className="underline text-zinc-800 font-bold hover:text-black"
+                      className="text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1"
                     >
-                      Manage Quotes →
+                      View quotes <ChevronRight size={13} />
                     </button>
                   </div>
                 </div>
 
-                {/* Summary Card 3: Open Orders */}
-                <div className="p-4 bg-white border border-zinc-400">
-                  <div className="flex items-center justify-between border-b border-zinc-200 pb-2 mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-600">
-                      Open Orders
+                {/* Metric 3: Open Orders */}
+                <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm hover:border-slate-300 transition-all">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-500">Active Work Orders</span>
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                      <ClipboardList size={16} />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-baseline gap-2">
+                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                      {workOrders.filter((w) => w.status !== 'Completed').length}
                     </span>
-                    <ClipboardList size={16} className="text-zinc-500" />
+                    <span className="text-xs font-medium text-blue-600">
+                      In Fulfillment
+                    </span>
                   </div>
-                  <div className="text-3xl font-bold tracking-tight text-zinc-900">
-                    {workOrders.filter((w) => w.status !== 'Completed').length}
+                  <div className="text-xs text-slate-500 mt-1">
+                    Ready for shop courier pickup or dispatch
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1">
-                    Work orders queued or in fulfillment
-                  </div>
-                  <div className="mt-3 pt-2 border-t border-zinc-200 flex justify-between items-center text-[10px]">
-                    <span className="text-zinc-500">Dispatch queue active</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span className="text-slate-400">100% on-time rate</span>
                     <button
                       onClick={() => setCurrentScreen('work-orders')}
-                      className="underline text-zinc-800 font-bold hover:text-black"
+                      className="text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1"
                     >
-                      View Dispatch →
+                      Dispatch queue <ChevronRight size={13} />
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* AI Features Demonstration Banner */}
-              <div className="p-4 bg-white border border-zinc-400 space-y-3">
-                <div className="flex items-center justify-between border-b border-zinc-200 pb-2">
-                  <div className="flex items-center gap-2">
-                    <Sparkles size={14} className="text-zinc-800" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-900">
-                      AI Automation Workflow (New Features)
-                    </span>
+              {/* AI Automation Feature Cards */}
+              <div className="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm">
+                <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                      <Sparkles size={15} />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-bold text-slate-900">
+                        Intelligent Quoting & Communication Suite
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        Accelerate commercial sales workflows with automatic estimate calculation and B2B email drafting.
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-[10px] bg-zinc-200 px-2 py-0.5 border border-zinc-400 font-bold">
-                    Fast Demo Flow
+                  <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
+                    Commercial Tools
                   </span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  <div className="border border-zinc-300 p-3 bg-zinc-50">
-                    <div className="font-bold text-zinc-900 flex items-center gap-1.5">
-                      <span>1. AI Quote Generation</span>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl border border-slate-200/70 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900">
+                        1. Automated Quotation Preparation
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-mono">Real PDF Export</span>
                     </div>
-                    <p className="text-[11px] text-zinc-600 mt-1 leading-relaxed">
-                      Automatically compiles inventory quantities, unit prices, customer contact, and calculates subtotal & PDF layout instantly.
+                    <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                      Select inventory items to instantly compute lines, unit margins, and client details, then download a certified PDF estimate.
                     </p>
                     <button
                       onClick={() => {
                         setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                         setIsCreateQuoteModalOpen(true);
                       }}
-                      className="mt-2 text-[10px] uppercase font-bold underline text-zinc-800 hover:text-black"
+                      className="mt-3 text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                     >
-                      Try Quote Generator →
+                      Launch Quote Generator <ArrowRight size={12} />
                     </button>
                   </div>
 
-                  <div className="border border-zinc-300 p-3 bg-zinc-50">
-                    <div className="font-bold text-zinc-900 flex items-center gap-1.5">
-                      <span>2. AI Email & Communication Assistant</span>
+                  <div className="p-4 rounded-xl border border-slate-200/70 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900">
+                        2. AI Communication Assistant
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-mono">1-Click Dispatch</span>
                     </div>
-                    <p className="text-[11px] text-zinc-600 mt-1 leading-relaxed">
-                      Drafts professional B2B client emails with the quote PDF attached, customizable instructions (discounts, terms), and 1-click dispatch.
+                    <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                      Drafts tailored client messages with attached PDF quotes, incorporating custom discounts or urgency terms seamlessly.
                     </p>
                     <button
                       onClick={() => handleOpenEmailFromQuoteRow(quotes[0])}
-                      className="mt-2 text-[10px] uppercase font-bold underline text-zinc-800 hover:text-black"
+                      className="mt-3 text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                     >
-                      Try Email Assistant →
+                      Open Email Assistant <ArrowRight size={12} />
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Wireframe Activity Preview (2 rows) */}
-              <div className="border border-zinc-400 bg-white">
-                <div className="p-3 border-b border-zinc-300 bg-zinc-100 flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-800">
-                    Recent System Records
-                  </span>
-                  <span className="text-[10px] text-zinc-500 font-mono">Sample feed</span>
-                </div>
-                <div className="divide-y divide-zinc-200 text-xs">
-                  <div className="p-3 flex items-center justify-between">
-                    <div>
-                      <span className="font-bold text-zinc-900">Work Order WO-501</span>
-                      <span className="text-zinc-600"> marked Ready for Pickup for Metro Auto Repair</span>
-                    </div>
-                    <span className="text-[10px] text-zinc-500">Today, 09:15</span>
+              {/* Polished Recent Activity Table */}
+              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                  <div className="flex items-center gap-2">
+                    <Clock size={15} className="text-slate-400" />
+                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Recent System Activity
+                    </span>
                   </div>
-                  <div className="p-3 flex items-center justify-between">
-                    <div>
-                      <span className="font-bold text-zinc-900">Quote Q-102</span>
-                      <span className="text-zinc-600"> ($1,260.00) sent to Apex Fleet Services via AI Email Assistant</span>
+                  <span className="text-xs text-slate-400">Live operational ledger</span>
+                </div>
+                <div className="divide-y divide-slate-100 text-xs">
+                  <div className="px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <div>
+                        <span className="font-semibold text-slate-900">Work Order WO-501</span>
+                        <span className="text-slate-600"> marked Ready for Pickup for Metro Auto Repair Center</span>
+                      </div>
                     </div>
-                    <span className="text-[10px] text-zinc-500">Today, 08:30</span>
+                    <span className="text-slate-400 font-mono text-[11px]">Today, 09:15 AM</span>
+                  </div>
+
+                  <div className="px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      <div>
+                        <span className="font-semibold text-slate-900">Quote Q-102</span>
+                        <span className="text-slate-600"> ($1,260.00) sent to Apex Fleet Logistics via AI Assistant</span>
+                      </div>
+                    </div>
+                    <span className="text-slate-400 font-mono text-[11px]">Today, 08:30 AM</span>
+                  </div>
+
+                  <div className="px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-amber-500" />
+                      <div>
+                        <span className="font-semibold text-slate-900">Inventory Alert</span>
+                        <span className="text-slate-600"> Alternator 120A reached low stock threshold (6 units remaining)</span>
+                      </div>
+                    </div>
+                    <span className="text-slate-400 font-mono text-[11px]">Yesterday, 04:45 PM</span>
                   </div>
                 </div>
               </div>
@@ -1283,23 +1382,23 @@ Commercial Accounts Team`,
 
           {/* SCREEN 2: INVENTORY */}
           {currentScreen === 'inventory' && (
-            <div className="max-w-5xl mx-auto space-y-4">
+            <div className="max-w-6xl mx-auto space-y-5">
               {/* Screen Header */}
-              <div className="border-b border-zinc-300 pb-3 flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
                 <div>
-                  <h1 className="text-lg font-bold uppercase tracking-wider text-zinc-900">
-                    Inventory
+                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                    Parts Inventory Catalog
                   </h1>
-                  <p className="text-xs text-zinc-600 mt-0.5">
-                    Parts catalog with stock levels, shelf locations, and unit pricing.
+                  <p className="text-xs text-slate-500 mt-1">
+                    Manage SKU inventory levels, warehouse bin coordinates, and wholesale trade pricing.
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <button
                     onClick={() => setIsAddPartModalOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 text-zinc-900 border border-zinc-400 text-xs font-semibold hover:bg-zinc-200"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold shadow-sm transition-all"
                   >
-                    <Plus size={14} />
+                    <Plus size={14} className="text-slate-500" />
                     <span>Add Part</span>
                   </button>
                   <button
@@ -1307,87 +1406,91 @@ Commercial Accounts Team`,
                       setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                       setIsCreateQuoteModalOpen(true);
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-semibold hover:bg-zinc-800"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
                   >
-                    <Sparkles size={13} />
+                    <Sparkles size={14} className="text-blue-200" />
                     <span>Create Quote with AI →</span>
                   </button>
                 </div>
               </div>
 
-              {/* Controls bar: Search Field */}
-              <div className="flex items-center justify-between gap-4 bg-white p-3 border border-zinc-400">
+              {/* Controls bar: Modern Search & Count */}
+              <div className="bg-white rounded-xl border border-slate-200/80 p-3.5 shadow-sm flex items-center justify-between gap-4">
                 <div className="flex-1 max-w-md relative">
                   <Search
-                    size={14}
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"
+                    size={15}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                   />
                   <input
                     type="text"
                     value={inventorySearch}
                     onChange={(e) => setInventorySearch(e.target.value)}
-                    placeholder="Search Part Name, Part Number, or Location..."
-                    className="w-full pl-8 pr-3 py-1.5 text-xs border border-zinc-400 bg-zinc-50 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900"
+                    placeholder="Search by part name, SKU number, or shelf location..."
+                    className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white transition-all"
                   />
                 </div>
-                <div className="text-[11px] text-zinc-500">
-                  Showing {filteredParts.length} of {parts.length} parts
+                <div className="text-xs text-slate-500 flex items-center gap-2">
+                  <span>Showing <strong className="text-slate-900">{filteredParts.length}</strong> of {parts.length} cataloged SKUs</span>
                 </div>
               </div>
 
-              {/* Simple Parts Table */}
-              <div className="bg-white border border-zinc-400 overflow-hidden">
+              {/* Polished Parts Table */}
+              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-zinc-200 border-b border-zinc-400 text-zinc-800 font-bold uppercase tracking-wider text-[11px]">
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Part Name</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Part Number</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300 text-right">Stock</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300 text-right">Price</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Location</th>
-                      <th className="py-2.5 px-3 text-center">Action</th>
+                    <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] tracking-wider">
+                      <th className="py-3 px-4">Part Name & Category</th>
+                      <th className="py-3 px-4">SKU / Part Number</th>
+                      <th className="py-3 px-4 text-right">Stock Level</th>
+                      <th className="py-3 px-4 text-right">Wholesale Price</th>
+                      <th className="py-3 px-4">Warehouse Location</th>
+                      <th className="py-3 px-4 text-center">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200">
+                  <tbody className="divide-y divide-slate-100">
                     {filteredParts.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="py-8 text-center text-zinc-400">
-                          [ No matching parts found ]
+                        <td colSpan={6} className="py-12 text-center text-slate-400">
+                          No matching components found for "{inventorySearch}".
                         </td>
                       </tr>
                     ) : (
                       filteredParts.map((part) => (
-                        <tr key={part.id} className="hover:bg-zinc-50">
-                          <td className="py-2.5 px-3 font-semibold text-zinc-900 border-r border-zinc-200">
-                            {part.name}
+                        <tr key={part.id} className="hover:bg-slate-50/70 transition-colors">
+                          <td className="py-3.5 px-4">
+                            <div className="font-semibold text-slate-900">{part.name}</div>
+                            <div className="text-[11px] text-slate-400 mt-0.5">{part.category || 'Automotive Component'}</div>
                           </td>
-                          <td className="py-2.5 px-3 font-mono text-zinc-700 border-r border-zinc-200">
-                            {part.number}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-mono border-r border-zinc-200">
-                            <span
-                              className={`px-1.5 py-0.5 border ${
-                                part.stock < 10
-                                  ? 'border-zinc-700 bg-zinc-200 font-bold'
-                                  : 'border-zinc-300 bg-zinc-50'
-                              }`}
-                            >
-                              {part.stock}
+                          <td className="py-3.5 px-4 font-mono font-medium text-slate-600">
+                            <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+                              {part.number}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono border-r border-zinc-200">
+                          <td className="py-3.5 px-4 text-right font-medium">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                                part.stock < 10
+                                  ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              }`}
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full ${part.stock < 10 ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                              {part.stock} in stock
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right font-semibold text-slate-900 font-mono">
                             ${part.price.toFixed(2)}
                           </td>
-                          <td className="py-2.5 px-3 text-zinc-700 border-r border-zinc-200">
+                          <td className="py-3.5 px-4 text-slate-600 font-medium">
                             {part.location}
                           </td>
-                          <td className="py-2.5 px-3 text-center">
+                          <td className="py-3.5 px-4 text-center">
                             <button
                               onClick={() => handleOpenQuoteWithPart(part)}
-                              className="px-2 py-0.5 border border-zinc-600 text-[10px] uppercase font-bold hover:bg-zinc-900 hover:text-white flex items-center gap-1 mx-auto"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-200 transition-colors"
                               title="Start quotation with this part"
                             >
-                              <Sparkles size={10} />
+                              <Sparkles size={12} className="text-blue-600" />
                               <span>Quote</span>
                             </button>
                           </td>
@@ -1398,9 +1501,9 @@ Commercial Accounts Team`,
                 </table>
               </div>
 
-              {/* Wireframe Flow Prompt */}
-              <div className="p-3 bg-zinc-200 border border-zinc-400 flex items-center justify-between text-xs">
-                <span className="text-zinc-700">
+              {/* Workflow callout footer */}
+              <div className="p-4 bg-white rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between text-xs">
+                <span className="text-slate-600">
                   <strong>Workflow Next Step:</strong> Select a customer and inventory parts to trigger <strong>"Generate Quote with AI"</strong>.
                 </span>
                 <button
@@ -1408,9 +1511,9 @@ Commercial Accounts Team`,
                     setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                     setIsCreateQuoteModalOpen(true);
                   }}
-                  className="flex items-center gap-1 font-bold underline text-zinc-900 hover:text-black"
+                  className="font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                 >
-                  Open Quote Generator →
+                  Open Quote Generator <ArrowRight size={13} />
                 </button>
               </div>
             </div>
@@ -1418,55 +1521,60 @@ Commercial Accounts Team`,
 
           {/* SCREEN 3: CUSTOMERS */}
           {currentScreen === 'customers' && (
-            <div className="max-w-5xl mx-auto space-y-4">
+            <div className="max-w-6xl mx-auto space-y-5">
               {/* Screen Header */}
-              <div className="border-b border-zinc-300 pb-3 flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
                 <div>
-                  <h1 className="text-lg font-bold uppercase tracking-wider text-zinc-900">
-                    Customers
+                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                    Workshop & Fleet Customers
                   </h1>
-                  <p className="text-xs text-zinc-600 mt-0.5">
-                    Basic directory of repair shops, fleet managers, and dealerships.
+                  <p className="text-xs text-slate-500 mt-1">
+                    Commercial client accounts, service garages, and authorized workshop contacts.
                   </p>
                 </div>
-                <div className="text-xs border border-zinc-400 bg-white px-2.5 py-1 text-zinc-600">
-                  {customers.length} Accounts Active
+                <div className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 shadow-sm">
+                  {customers.length} Accounts Enrolled
                 </div>
               </div>
 
-              {/* Basic Customer Table (Name, Company, Contact) */}
-              <div className="bg-white border border-zinc-400 overflow-hidden">
+              {/* Customer Table */}
+              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-zinc-200 border-b border-zinc-400 text-zinc-800 font-bold uppercase tracking-wider text-[11px]">
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Name</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Company</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Contact & Email</th>
-                      <th className="py-2.5 px-3 text-center">Action</th>
+                    <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] tracking-wider">
+                      <th className="py-3 px-4">Contact Representative</th>
+                      <th className="py-3 px-4">Company / Garage</th>
+                      <th className="py-3 px-4">Contact Details & Email</th>
+                      <th className="py-3 px-4 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200">
+                  <tbody className="divide-y divide-slate-100">
                     {customers.map((c) => (
-                      <tr key={c.id} className="hover:bg-zinc-50">
-                        <td className="py-2.5 px-3 font-semibold text-zinc-900 border-r border-zinc-200">
-                          {c.name}
+                      <tr key={c.id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="font-semibold text-slate-900">{c.name}</div>
+                          <div className="text-[11px] text-slate-400">Account Owner</div>
                         </td>
-                        <td className="py-2.5 px-3 text-zinc-800 border-r border-zinc-200">
-                          {c.company}
+                        <td className="py-3.5 px-4">
+                          <div className="font-medium text-slate-800 flex items-center gap-1.5">
+                            <Building2 size={13} className="text-slate-400" />
+                            <span>{c.company}</span>
+                          </div>
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-zinc-600 border-r border-zinc-200">
-                          {c.contact}
+                        <td className="py-3.5 px-4">
+                          <div className="text-slate-600 font-medium">{c.email}</div>
+                          <div className="text-[11px] text-slate-400 font-mono mt-0.5">{c.phone}</div>
                         </td>
-                        <td className="py-2.5 px-3 text-center">
+                        <td className="py-3.5 px-4 text-center">
                           <button
                             onClick={() => {
                               setQuoteCustomerId(c.id);
                               setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                               setIsCreateQuoteModalOpen(true);
                             }}
-                            className="px-2 py-0.5 border border-zinc-600 text-[10px] uppercase font-bold hover:bg-zinc-900 hover:text-white flex items-center gap-1 mx-auto"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-colors"
                           >
-                            <Sparkles size={10} />
+                            <Sparkles size={12} />
                             <span>AI Quote</span>
                           </button>
                         </td>
@@ -1476,23 +1584,26 @@ Commercial Accounts Team`,
                 </table>
               </div>
 
-              <div className="p-3 border border-dashed border-zinc-400 text-[11px] text-zinc-600 bg-zinc-50">
-                [ Wireframe Note: Customer email addresses are used automatically by the AI Email & Communication Assistant for direct quotation transmission. ]
+              <div className="p-4 rounded-xl border border-slate-200/70 bg-white text-xs text-slate-500 shadow-sm flex items-center gap-3">
+                <ShieldCheck size={18} className="text-blue-600 flex-shrink-0" />
+                <span>
+                  All client email addresses are pre-verified for direct B2B automated PDF transmission through the AI Email & Communication Assistant.
+                </span>
               </div>
             </div>
           )}
 
           {/* SCREEN 4: QUOTES */}
           {currentScreen === 'quotes' && (
-            <div className="max-w-5xl mx-auto space-y-4">
+            <div className="max-w-6xl mx-auto space-y-5">
               {/* Screen Header */}
-              <div className="border-b border-zinc-300 pb-3 flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
                 <div>
-                  <h1 className="text-lg font-bold uppercase tracking-wider text-zinc-900">
-                    Quotes
+                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                    Quotations & Commercial Pipeline
                   </h1>
-                  <p className="text-xs text-zinc-600 mt-0.5">
-                    Customer pricing estimates, AI quote generation, and automated email communication.
+                  <p className="text-xs text-slate-500 mt-1">
+                    Manage parts quotations, generate real PDF documents, and draft client communications.
                   </p>
                 </div>
                 <button
@@ -1500,74 +1611,85 @@ Commercial Accounts Team`,
                     setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                     setIsCreateQuoteModalOpen(true);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-semibold hover:bg-zinc-800"
+                  className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
                 >
                   <Plus size={14} />
                   <span>Create Quote</span>
                 </button>
               </div>
 
-              {/* Simple Quotation Table (Quote ID, Customer, Amount, Status) */}
-              <div className="bg-white border border-zinc-400 overflow-hidden">
+              {/* Quotations Table */}
+              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-zinc-200 border-b border-zinc-400 text-zinc-800 font-bold uppercase tracking-wider text-[11px]">
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Quote ID</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Customer</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Items / Scope</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300 text-right">Amount</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300 text-center">Status</th>
-                      <th className="py-2.5 px-3 text-center">AI Actions & Flow</th>
+                    <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] tracking-wider">
+                      <th className="py-3 px-4">Quote ID</th>
+                      <th className="py-3 px-4">Client Customer</th>
+                      <th className="py-3 px-4">Parts Summary</th>
+                      <th className="py-3 px-4 text-right">Amount</th>
+                      <th className="py-3 px-4 text-center">Status</th>
+                      <th className="py-3 px-4 text-center">Actions & Flow</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200">
+                  <tbody className="divide-y divide-slate-100">
                     {quotes.map((q) => (
-                      <tr key={q.id} className="hover:bg-zinc-50">
-                        <td className="py-2.5 px-3 font-mono font-bold text-zinc-900 border-r border-zinc-200">
-                          {q.id}
+                      <tr key={q.id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                          <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+                            {q.id}
+                          </span>
                         </td>
-                        <td className="py-2.5 px-3 text-zinc-800 border-r border-zinc-200">
-                          <div>{q.customerName}</div>
-                          <div className="text-[10px] text-zinc-500 font-mono">{q.customerEmail}</div>
+                        <td className="py-3.5 px-4">
+                          <div className="font-semibold text-slate-900">{q.customerName}</div>
+                          <div className="text-[11px] text-slate-400 font-mono">{q.customerEmail}</div>
                         </td>
-                        <td className="py-2.5 px-3 text-zinc-600 border-r border-zinc-200">
+                        <td className="py-3.5 px-4 text-slate-600 font-medium">
                           {q.itemsSummary}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-semibold text-zinc-900 border-r border-zinc-200">
+                        <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900">
                           ${q.amount.toFixed(2)}
                         </td>
-                        <td className="py-2.5 px-3 text-center border-r border-zinc-200">
+                        <td className="py-3.5 px-4 text-center">
                           <span
-                            className={`px-2 py-0.5 border text-[10px] uppercase font-bold ${
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                               q.status === 'Approved'
-                                ? 'bg-zinc-900 text-white border-zinc-900'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : q.status === 'Pending'
-                                ? 'bg-zinc-200 text-zinc-800 border-zinc-400'
-                                : 'bg-white text-zinc-600 border-zinc-300'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                : 'bg-slate-100 text-slate-600 border border-slate-200'
                             }`}
                           >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                q.status === 'Approved'
+                                  ? 'bg-emerald-500'
+                                  : q.status === 'Pending'
+                                  ? 'bg-amber-500'
+                                  : 'bg-slate-400'
+                              }`}
+                            />
                             {q.status}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-center">
+                        <td className="py-3.5 px-4 text-center">
                           <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                            {/* Download PDF button */}
+                            {/* Download Real PDF */}
                             <button
                               onClick={() => handleDownloadPDFFromQuoteRow(q)}
-                              className="px-2 py-1 bg-white text-zinc-800 border border-zinc-400 text-[10px] uppercase font-bold hover:bg-zinc-100 flex items-center gap-1"
+                              className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs flex items-center gap-1 transition-colors"
                               title="Download official PDF quotation document"
                             >
-                              <Download size={11} />
+                              <Download size={12} className="text-slate-500" />
                               <span>PDF</span>
                             </button>
 
-                            {/* AI Email Assistant shortcut */}
+                            {/* Draft Email with AI */}
                             <button
                               onClick={() => handleOpenEmailFromQuoteRow(q)}
-                              className="px-2 py-1 bg-zinc-100 text-zinc-800 border border-zinc-400 text-[10px] uppercase font-bold hover:bg-zinc-200 flex items-center gap-1"
+                              className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center gap-1 transition-colors"
                               title="Draft Email with AI for this quotation"
                             >
-                              <Mail size={11} />
+                              <Mail size={12} />
                               <span>Draft Email</span>
                             </button>
 
@@ -1575,10 +1697,11 @@ Commercial Accounts Team`,
                             {q.status === 'Approved' ? (
                               <button
                                 onClick={() => handleConvertToWorkOrder(q)}
-                                className="px-2 py-1 bg-zinc-900 text-white border border-zinc-900 text-[10px] uppercase font-bold hover:bg-zinc-800"
+                                className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs flex items-center gap-1 transition-colors"
                                 title="Convert approved quote into an active work order"
                               >
-                                Work Order →
+                                <span>Work Order</span>
+                                <ArrowRight size={12} />
                               </button>
                             ) : (
                               <button
@@ -1589,7 +1712,7 @@ Commercial Accounts Team`,
                                     )
                                   );
                                 }}
-                                className="px-2 py-1 border border-zinc-400 text-zinc-700 text-[10px] uppercase font-bold hover:bg-zinc-100"
+                                className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-200 transition-colors"
                               >
                                 Approve
                               </button>
@@ -1602,16 +1725,16 @@ Commercial Accounts Team`,
                 </table>
               </div>
 
-              {/* Workflow callout */}
-              <div className="p-3 bg-zinc-200 border border-zinc-400 flex items-center justify-between text-xs">
-                <span className="text-zinc-700">
-                  <strong>Workflow Next Step:</strong> Review quotes, draft emails with the AI assistant, or convert approved quotes to Work Orders.
+              {/* Workflow callout footer */}
+              <div className="p-4 bg-white rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between text-xs">
+                <span className="text-slate-600">
+                  <strong>Workflow Next Step:</strong> Approved quotes can be converted into active Work Orders for workshop warehouse fulfillment.
                 </span>
                 <button
                   onClick={() => setCurrentScreen('work-orders')}
-                  className="flex items-center gap-1 font-bold underline text-zinc-900 hover:text-black"
+                  className="font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                 >
-                  View Work Orders Screen →
+                  View Work Orders Screen <ArrowRight size={13} />
                 </button>
               </div>
             </div>
@@ -1619,74 +1742,86 @@ Commercial Accounts Team`,
 
           {/* SCREEN 5: WORK ORDERS */}
           {currentScreen === 'work-orders' && (
-            <div className="max-w-5xl mx-auto space-y-4">
+            <div className="max-w-6xl mx-auto space-y-5">
               {/* Screen Header */}
-              <div className="border-b border-zinc-300 pb-3 flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
                 <div>
-                  <h1 className="text-lg font-bold uppercase tracking-wider text-zinc-900">
-                    Work Orders
+                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                    Workshop Orders & Dispatch Queue
                   </h1>
-                  <p className="text-xs text-zinc-600 mt-0.5">
-                    Fulfillment tracking, order dispatch status, and customer collection.
+                  <p className="text-xs text-slate-500 mt-1">
+                    Fulfillment tracking, order dispatch status, and client workshop collection.
                   </p>
                 </div>
-                <div className="text-xs border border-zinc-400 bg-white px-2.5 py-1 text-zinc-600">
+                <div className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 shadow-sm">
                   {workOrders.length} Total Orders
                 </div>
               </div>
 
-              {/* Basic Table (Order ID, Customer, Status, Dispatch Status) */}
-              <div className="bg-white border border-zinc-400 overflow-hidden">
+              {/* Work Orders Table */}
+              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-zinc-200 border-b border-zinc-400 text-zinc-800 font-bold uppercase tracking-wider text-[11px]">
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Order ID</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Customer</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300">Parts Assigned</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300 text-center">Status</th>
-                      <th className="py-2.5 px-3 border-r border-zinc-300 text-center">Dispatch Status</th>
-                      <th className="py-2.5 px-3 text-center">Action</th>
+                    <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] tracking-wider">
+                      <th className="py-3 px-4">Order ID</th>
+                      <th className="py-3 px-4">Client Customer</th>
+                      <th className="py-3 px-4">Parts Assigned</th>
+                      <th className="py-3 px-4 text-center">Status</th>
+                      <th className="py-3 px-4 text-center">Dispatch Status</th>
+                      <th className="py-3 px-4 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200">
+                  <tbody className="divide-y divide-slate-100">
                     {workOrders.map((wo) => (
-                      <tr key={wo.id} className="hover:bg-zinc-50">
-                        <td className="py-2.5 px-3 font-mono font-bold text-zinc-900 border-r border-zinc-200">
-                          {wo.id}
+                      <tr key={wo.id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                          <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+                            {wo.id}
+                          </span>
                         </td>
-                        <td className="py-2.5 px-3 text-zinc-800 font-medium border-r border-zinc-200">
+                        <td className="py-3.5 px-4 font-semibold text-slate-900">
                           {wo.customerName}
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-zinc-600 border-r border-zinc-200">
+                        <td className="py-3.5 px-4 text-slate-600 font-medium">
                           {wo.partsSummary}
                         </td>
-                        <td className="py-2.5 px-3 text-center border-r border-zinc-200">
+                        <td className="py-3.5 px-4 text-center">
                           <span
-                            className={`px-2 py-0.5 border text-[10px] uppercase font-bold ${
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                               wo.status === 'Completed'
-                                ? 'bg-zinc-900 text-white border-zinc-900'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : wo.status === 'In Progress'
-                                ? 'bg-zinc-200 text-zinc-900 border-zinc-400'
-                                : 'bg-white text-zinc-600 border-zinc-300'
+                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                : 'bg-slate-100 text-slate-600 border border-slate-200'
                             }`}
                           >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                wo.status === 'Completed'
+                                  ? 'bg-emerald-500'
+                                  : wo.status === 'In Progress'
+                                  ? 'bg-blue-500'
+                                  : 'bg-slate-400'
+                              }`}
+                            />
                             {wo.status}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-center border-r border-zinc-200">
+                        <td className="py-3.5 px-4 text-center">
                           <span
-                            className={`px-2 py-0.5 border text-[10px] uppercase font-mono ${
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                               wo.dispatchStatus === 'Dispatched'
-                                ? 'bg-zinc-100 text-zinc-900 border-zinc-400 font-bold'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : wo.dispatchStatus === 'Ready for Pickup'
-                                ? 'bg-zinc-200 text-zinc-900 border-zinc-600 font-bold'
-                                : 'bg-white text-zinc-600 border-zinc-300'
+                                ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                                : 'bg-amber-50 text-amber-700 border border-amber-200'
                             }`}
                           >
+                            <Truck size={11} />
                             {wo.dispatchStatus}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-center">
+                        <td className="py-3.5 px-4 text-center">
                           {wo.dispatchStatus !== 'Dispatched' ? (
                             <button
                               onClick={() => {
@@ -1702,13 +1837,13 @@ Commercial Accounts Team`,
                                   )
                                 );
                               }}
-                              className="px-2 py-1 border border-zinc-600 text-[10px] uppercase font-bold hover:bg-zinc-900 hover:text-white"
+                              className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-colors"
                             >
                               Dispatch Order
                             </button>
                           ) : (
-                            <span className="text-[10px] text-zinc-400 font-mono">
-                              [ Closed ]
+                            <span className="text-[11px] text-slate-400 font-medium">
+                              Fulfilled
                             </span>
                           )}
                         </td>
@@ -1718,19 +1853,20 @@ Commercial Accounts Team`,
                 </table>
               </div>
 
-              {/* Flow Completion Box */}
-              <div className="p-4 bg-white border border-zinc-400 text-xs space-y-2">
-                <div className="font-bold text-zinc-900 uppercase tracking-wider text-[11px]">
-                  End of Prototype Demonstration Flow
+              {/* Flow Completion Card */}
+              <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-3">
+                <div className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-600" />
+                  <span>Complete B2B Workflow Cycle Demonstrated</span>
                 </div>
-                <p className="text-zinc-600 text-[11px] leading-relaxed">
-                  The client has walked through the complete AI-enabled workflow:
-                  <strong> Dashboard</strong> → <strong>Inventory selection</strong> → <strong>Generate Quote with AI</strong> → <strong>PDF Preview & Download</strong> → <strong>Draft Email with AI</strong> → <strong>Customer Dispatch</strong>.
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  The client has walked through the complete modern B2B SaaS workflow:
+                  <strong> Dashboard overview</strong> → <strong>Inventory checking & selection</strong> → <strong>AI Quote Generation & real PDF download</strong> → <strong>AI Email assistant dispatch</strong> → <strong>Work order fulfillment</strong>.
                 </p>
-                <div className="pt-2 flex items-center gap-3">
+                <div className="pt-1 flex items-center gap-3">
                   <button
                     onClick={() => setCurrentScreen('dashboard')}
-                    className="px-3 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-semibold hover:bg-zinc-800"
+                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-all"
                   >
                     Return to Dashboard
                   </button>
@@ -1739,10 +1875,10 @@ Commercial Accounts Team`,
                       setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                       setIsCreateQuoteModalOpen(true);
                     }}
-                    className="px-3 py-1.5 border border-zinc-400 text-zinc-800 text-xs font-semibold hover:bg-zinc-100 flex items-center gap-1.5"
+                    className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
                   >
-                    <Sparkles size={13} />
-                    <span>Test Another AI Quote</span>
+                    <Sparkles size={13} className="text-blue-600" />
+                    <span>Generate Another Quote</span>
                   </button>
                 </div>
               </div>
@@ -1751,27 +1887,28 @@ Commercial Accounts Team`,
         </main>
       </div>
 
-      {/* WIREFRAME MODAL: ADD PART */}
+      {/* MODERN MODAL: ADD PART */}
       {isAddPartModalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-md bg-white border-2 border-zinc-900 shadow-none">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
             {/* Modal Header */}
-            <div className="p-3 bg-zinc-200 border-b border-zinc-400 flex items-center justify-between">
-              <span className="font-bold text-xs uppercase tracking-wider text-zinc-900">
-                [ Form: Add Part ]
-              </span>
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div>
+                <h3 className="font-bold text-sm text-slate-900">Add Inventory Part</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Register a new SKU into warehouse stock</p>
+              </div>
               <button
                 onClick={() => setIsAddPartModalOpen(false)}
-                className="p-1 hover:bg-zinc-300 text-zinc-700"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleAddPart} className="p-4 space-y-3 text-xs">
+            <form onSubmit={handleAddPart} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
+                <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
                   Part Name:
                 </label>
                 <input
@@ -1779,15 +1916,15 @@ Commercial Accounts Team`,
                   required
                   value={newPartName}
                   onChange={(e) => setNewPartName(e.target.value)}
-                  placeholder="e.g. Radiator Assembly 2.0L"
-                  className="w-full px-2.5 py-1.5 border border-zinc-400 bg-zinc-50 focus:outline-none focus:border-zinc-900"
+                  placeholder="e.g. Radiator Assembly 2.0L Turbo"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white placeholder:text-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
-                    Part Number:
+                  <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                    Part Number / SKU:
                   </label>
                   <input
                     type="text"
@@ -1795,39 +1932,39 @@ Commercial Accounts Team`,
                     value={newPartNumber}
                     onChange={(e) => setNewPartNumber(e.target.value)}
                     placeholder="e.g. RAD-3310"
-                    className="w-full px-2.5 py-1.5 border border-zinc-400 bg-zinc-50 focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white placeholder:text-slate-400 text-xs uppercase font-mono focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
-                    Shelf Location:
+                  <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                    Warehouse Location:
                   </label>
                   <input
                     type="text"
                     value={newPartLocation}
                     onChange={(e) => setNewPartLocation(e.target.value)}
                     placeholder="e.g. Shelf B-02"
-                    className="w-full px-2.5 py-1.5 border border-zinc-400 bg-zinc-50 focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white placeholder:text-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
-                    Initial Stock:
+                  <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                    Initial Stock Count:
                   </label>
                   <input
                     type="number"
                     min="0"
                     value={newPartStock}
                     onChange={(e) => setNewPartStock(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-zinc-400 bg-zinc-50 focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
-                    Unit Price ($):
+                  <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                    Wholesale Price ($):
                   </label>
                   <input
                     type="number"
@@ -1835,24 +1972,24 @@ Commercial Accounts Team`,
                     min="0"
                     value={newPartPrice}
                     onChange={(e) => setNewPartPrice(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-zinc-400 bg-zinc-50 focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-zinc-300 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsAddPartModalOpen(false)}
-                  className="px-3 py-1.5 border border-zinc-400 text-zinc-700 text-xs hover:bg-zinc-100"
+                  className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-semibold hover:bg-zinc-800"
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
                 >
-                  Save Part
+                  Save Part to Catalog
                 </button>
               </div>
             </form>
@@ -1860,39 +1997,40 @@ Commercial Accounts Team`,
         </div>
       )}
 
-      {/* WIREFRAME MODAL: CREATE QUOTE (WITH "GENERATE QUOTE WITH AI") */}
+      {/* MODERN MODAL: CREATE QUOTE (WITH "GENERATE QUOTE WITH AI") */}
       {isCreateQuoteModalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-lg bg-white border-2 border-zinc-900 shadow-none">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
             {/* Modal Header */}
-            <div className="p-3 bg-zinc-200 border-b border-zinc-400 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-xs uppercase tracking-wider text-zinc-900">
-                  [ Screen: Create Quote ]
-                </span>
-                <span className="text-[10px] bg-zinc-900 text-white px-1.5 py-0.2 font-bold">
-                  AI ENABLED
-                </span>
+                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Sparkles size={14} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900">Create Quotation</h3>
+                  <p className="text-xs text-slate-500">Configure client parts with AI assistance</p>
+                </div>
               </div>
               <button
                 onClick={() => setIsCreateQuoteModalOpen(false)}
-                className="p-1 hover:bg-zinc-300 text-zinc-700"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSaveStandardQuote} className="p-4 space-y-4 text-xs">
+            <form onSubmit={handleSaveStandardQuote} className="p-6 space-y-4 text-xs">
               {/* Customer Selector */}
               <div>
-                <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
-                  1. Select Customer:
+                <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                  1. Select Client Workshop:
                 </label>
                 <select
                   value={quoteCustomerId}
                   onChange={(e) => setQuoteCustomerId(e.target.value)}
-                  className="w-full px-2.5 py-1.5 border border-zinc-400 bg-zinc-50 focus:outline-none focus:border-zinc-900"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all font-medium text-slate-900"
                 >
                   {customers.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -1904,26 +2042,26 @@ Commercial Accounts Team`,
 
               {/* Inventory Parts Selector & Quantities */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-zinc-700 font-bold uppercase text-[10px]">
-                    2. Select Parts & Quantities:
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-slate-700 font-semibold text-xs">
+                    2. Select Line Items & Quantities:
                   </label>
                   <button
                     type="button"
                     onClick={handleAddQuoteLineItem}
-                    className="text-[10px] underline font-bold text-zinc-700 hover:text-black flex items-center gap-1"
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                   >
-                    <Plus size={10} /> Add Part Line
+                    <Plus size={12} /> Add Item Line
                   </button>
                 </div>
 
-                <div className="space-y-2 border border-zinc-300 p-2.5 bg-zinc-50">
+                <div className="space-y-2 border border-slate-200 rounded-xl p-3 bg-slate-50/50">
                   {quoteItems.map((qi, idx) => (
                     <div key={idx} className="flex items-center gap-2">
                       <select
                         value={qi.partId}
                         onChange={(e) => handleUpdateQuoteLineItem(idx, 'partId', e.target.value)}
-                        className="flex-1 px-2 py-1 text-xs border border-zinc-400 bg-white focus:outline-none focus:border-zinc-900"
+                        className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 font-medium"
                       >
                         {parts.map((p) => (
                           <option key={p.id} value={p.id}>
@@ -1939,11 +2077,11 @@ Commercial Accounts Team`,
                           title="Quantity"
                           value={qi.quantity}
                           onChange={(e) => handleUpdateQuoteLineItem(idx, 'quantity', e.target.value)}
-                          className="w-full px-2 py-1 text-xs border border-zinc-400 bg-white text-center font-mono focus:outline-none"
+                          className="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-center font-mono font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/20"
                         />
                       </div>
 
-                      <div className="w-20 text-right font-mono text-zinc-800 text-xs">
+                      <div className="w-20 text-right font-mono font-bold text-slate-900 text-xs">
                         ${(qi.quantity * qi.unitPrice).toFixed(2)}
                       </div>
 
@@ -1951,10 +2089,10 @@ Commercial Accounts Team`,
                         <button
                           type="button"
                           onClick={() => handleRemoveQuoteLineItem(idx)}
-                          className="p-1 hover:bg-zinc-200 text-zinc-600"
+                          className="p-1 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                           title="Remove line item"
                         >
-                          <Trash2 size={12} />
+                          <Trash2 size={13} />
                         </button>
                       )}
                     </div>
@@ -1962,24 +2100,24 @@ Commercial Accounts Team`,
                 </div>
               </div>
 
-              {/* Financial Calculation Summary */}
-              <div className="border border-zinc-300 bg-zinc-100 p-3 space-y-1 text-xs">
-                <div className="flex justify-between text-zinc-600">
+              {/* Financial Calculation Summary Card */}
+              <div className="rounded-xl border border-slate-200/90 bg-slate-50/80 p-4 space-y-1.5 text-xs">
+                <div className="flex justify-between text-slate-600">
                   <span>Subtotal Amount:</span>
-                  <span className="font-mono font-medium">
+                  <span className="font-mono font-semibold text-slate-800">
                     $
                     {quoteItems
                       .reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
                       .toFixed(2)}
                   </span>
                 </div>
-                <div className="flex justify-between text-zinc-600">
-                  <span>Tax (Wholesale Exemption 0%):</span>
-                  <span className="font-mono">$0.00</span>
+                <div className="flex justify-between text-slate-600">
+                  <span>B2B Wholesale Trade Exemption:</span>
+                  <span className="font-mono text-slate-500">$0.00</span>
                 </div>
-                <div className="flex justify-between text-zinc-900 font-bold border-t border-zinc-300 pt-1 text-sm">
-                  <span>Estimated Total:</span>
-                  <span className="font-mono">
+                <div className="flex justify-between text-slate-900 font-bold border-t border-slate-200 pt-2 text-sm">
+                  <span>Total Estimate:</span>
+                  <span className="font-mono text-blue-600 text-base">
                     $
                     {quoteItems
                       .reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
@@ -1989,19 +2127,19 @@ Commercial Accounts Team`,
               </div>
 
               {/* ACTION BUTTONS (INCLUDES "GENERATE QUOTE WITH AI") */}
-              <div className="pt-3 border-t border-zinc-300 flex flex-col sm:flex-row items-center justify-between gap-2">
+              <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => setIsCreateQuoteModalOpen(false)}
-                  className="px-3 py-1.5 border border-zinc-400 text-zinc-700 text-xs hover:bg-zinc-100 w-full sm:w-auto"
+                  className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors w-full sm:w-auto"
                 >
                   Cancel
                 </button>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
                   <button
                     type="submit"
-                    className="px-3 py-1.5 border border-zinc-400 bg-zinc-100 text-zinc-800 text-xs hover:bg-zinc-200"
+                    className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 shadow-xs transition-colors"
                   >
                     Save Standard Quote
                   </button>
@@ -2011,10 +2149,10 @@ Commercial Accounts Team`,
                     type="button"
                     onClick={handleGenerateQuoteWithAI}
                     disabled={quoteGeneratingNotice}
-                    className="px-3 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-bold hover:bg-zinc-800 flex items-center justify-center gap-1.5"
+                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5"
                   >
-                    <Sparkles size={13} />
-                    <span>{quoteGeneratingNotice ? 'Generating...' : 'Generate Quote with AI'}</span>
+                    <Sparkles size={14} className="text-blue-200" />
+                    <span>{quoteGeneratingNotice ? 'Generating Preview...' : 'Generate Quote with AI'}</span>
                   </button>
                 </div>
               </div>
@@ -2023,120 +2161,121 @@ Commercial Accounts Team`,
         </div>
       )}
 
-      {/* AI FEATURE 1: GENERATED QUOTATION PREVIEW MODAL (PDF-STYLE) */}
+      {/* AI FEATURE 1: GENERATED QUOTATION PREVIEW MODAL (REALISTIC PDF SHEET) */}
       {isQuotePreviewModalOpen && activeGeneratedQuote && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="w-full max-w-2xl bg-white border-2 border-zinc-900 shadow-none my-8">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
             {/* Modal Top Control Bar */}
-            <div className="p-3 bg-zinc-200 border-b border-zinc-400 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-xs uppercase tracking-wider text-zinc-900">
-                  [ Generated Quotation Preview ]
-                </span>
-                <span className="text-[10px] bg-zinc-800 text-white px-2 py-0.5 font-bold uppercase">
-                  PDF Preview
-                </span>
+                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Sparkles size={14} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900">Quotation Preview</h3>
+                  <p className="text-xs text-slate-500">Official certified PDF format preview</p>
+                </div>
               </div>
               <button
                 onClick={() => setIsQuotePreviewModalOpen(false)}
-                className="p-1 hover:bg-zinc-300 text-zinc-700"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             </div>
 
             {/* Document PDF Sheet Simulation */}
-            <div className="p-6 bg-zinc-50 border-b border-zinc-300 font-mono text-xs text-zinc-800 space-y-5">
-              {/* PDF Document Header */}
-              <div className="border-b-2 border-zinc-800 pb-4 flex justify-between items-start">
+            <div className="p-8 bg-slate-50/40 text-xs text-slate-800 space-y-6">
+              {/* Document Header */}
+              <div className="border-b border-slate-200 pb-5 flex justify-between items-start">
                 <div>
-                  <div className="font-bold text-base tracking-tight text-zinc-900 uppercase">
-                    AUTO-PARTS DISTRIBUTION CO.
+                  <div className="font-bold text-base tracking-tight text-slate-900 uppercase">
+                    AUTOPARTS PRO B2B SAAS
                   </div>
-                  <div className="text-[10px] text-zinc-500 mt-0.5">
+                  <div className="text-[11px] text-slate-500 mt-1">
                     100 Industrial Parkway, Warehouse Bay 4 • (555) 019-2830
                   </div>
-                  <div className="text-[10px] text-zinc-500">
-                    quotes@autopartssaas.demo • Tax ID: US-8829-1092
+                  <div className="text-[11px] text-slate-500">
+                    support@autopartspro.io • Tax ID: US-8829-1092
                   </div>
                 </div>
-                <div className="text-right border border-zinc-400 p-2 bg-white">
-                  <div className="text-[10px] uppercase font-bold text-zinc-500">
+                <div className="text-right p-3 rounded-xl bg-white border border-slate-200 shadow-xs">
+                  <div className="text-[10px] uppercase font-bold text-slate-400">
                     Official Quotation
                   </div>
-                  <div className="text-sm font-bold text-zinc-900">
+                  <div className="text-sm font-bold text-slate-900 font-mono mt-0.5">
                     {activeGeneratedQuote.quoteId}
                   </div>
-                  <div className="text-[10px] text-zinc-600 mt-1">
+                  <div className="text-[11px] text-slate-500 mt-1">
                     Date: {activeGeneratedQuote.date}
                   </div>
-                  <div className="text-[10px] text-zinc-500">
+                  <div className="text-[11px] text-slate-400">
                     Valid: {activeGeneratedQuote.validUntil}
                   </div>
                 </div>
               </div>
 
               {/* Customer Details Box */}
-              <div className="grid grid-cols-2 gap-4 border border-zinc-300 p-3 bg-white">
+              <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
                 <div>
-                  <div className="text-[10px] font-bold uppercase text-zinc-500 mb-1">
+                  <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">
                     Prepared For (Customer Details):
                   </div>
-                  <div className="font-bold text-zinc-900 text-sm">
+                  <div className="font-bold text-slate-900 text-sm">
                     {activeGeneratedQuote.customer.company}
                   </div>
-                  <div className="text-zinc-700 mt-0.5">
+                  <div className="text-slate-700 mt-0.5">
                     Attn: {activeGeneratedQuote.customer.name}
                   </div>
-                  <div className="text-[11px] text-zinc-600">
-                    Email: {activeGeneratedQuote.customer.email}
+                  <div className="text-slate-500 mt-0.5">
+                    {activeGeneratedQuote.customer.email}
                   </div>
-                  <div className="text-[11px] text-zinc-600">
-                    Phone: {activeGeneratedQuote.customer.phone}
+                  <div className="text-slate-500 font-mono text-[11px]">
+                    {activeGeneratedQuote.customer.phone}
                   </div>
                 </div>
-                <div className="border-l border-zinc-200 pl-4 text-[11px] space-y-1 text-zinc-600">
-                  <div className="text-[10px] font-bold uppercase text-zinc-500">
-                    Quotation Terms:
+                <div className="border-l border-slate-100 pl-4 space-y-1 text-slate-600 text-xs">
+                  <div className="text-[10px] font-bold uppercase text-slate-400">
+                    Commercial Terms:
                   </div>
-                  <div>• Payment Terms: Net 30 upon dispatch</div>
-                  <div>• Warranty: 12-Month OEM Guarantee</div>
-                  <div>• Estimated Dispatch: 24 - 48 business hours</div>
+                  <div>• Net 30 days upon shop delivery</div>
+                  <div>• 12-Month OEM guarantee included</div>
+                  <div>• Immediate warehouse dispatch</div>
                 </div>
               </div>
 
               {/* Parts Description Table */}
-              <div className="border border-zinc-400 bg-white overflow-hidden">
+              <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-zinc-200 border-b border-zinc-400 text-zinc-800 font-bold uppercase text-[10px]">
-                      <th className="py-2 px-3 border-r border-zinc-300">#</th>
-                      <th className="py-2 px-3 border-r border-zinc-300">Parts Description</th>
-                      <th className="py-2 px-3 border-r border-zinc-300">Part Number</th>
-                      <th className="py-2 px-3 border-r border-zinc-300 text-right">Qty</th>
-                      <th className="py-2 px-3 border-r border-zinc-300 text-right">Unit Price</th>
-                      <th className="py-2 px-3 text-right">Total</th>
+                    <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px] tracking-wider">
+                      <th className="py-2.5 px-3.5">#</th>
+                      <th className="py-2.5 px-3.5">Parts Description</th>
+                      <th className="py-2.5 px-3.5">Part Number</th>
+                      <th className="py-2.5 px-3.5 text-right">Qty</th>
+                      <th className="py-2.5 px-3.5 text-right">Unit Price</th>
+                      <th className="py-2.5 px-3.5 text-right">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200">
+                  <tbody className="divide-y divide-slate-100">
                     {activeGeneratedQuote.items.map((it, idx) => (
-                      <tr key={idx}>
-                        <td className="py-2 px-3 font-mono text-zinc-500 border-r border-zinc-200">
+                      <tr key={idx} className="hover:bg-slate-50/50">
+                        <td className="py-2.5 px-3.5 text-slate-400 font-mono">
                           {idx + 1}
                         </td>
-                        <td className="py-2 px-3 font-semibold text-zinc-900 border-r border-zinc-200">
+                        <td className="py-2.5 px-3.5 font-semibold text-slate-900">
                           {it.partName}
                         </td>
-                        <td className="py-2 px-3 font-mono text-zinc-600 border-r border-zinc-200">
+                        <td className="py-2.5 px-3.5 font-mono text-slate-600">
                           {it.partNumber}
                         </td>
-                        <td className="py-2 px-3 text-right font-mono border-r border-zinc-200">
+                        <td className="py-2.5 px-3.5 text-right font-medium text-slate-900">
                           {it.quantity}
                         </td>
-                        <td className="py-2 px-3 text-right font-mono border-r border-zinc-200">
+                        <td className="py-2.5 px-3.5 text-right font-mono text-slate-600">
                           ${it.unitPrice.toFixed(2)}
                         </td>
-                        <td className="py-2 px-3 text-right font-mono font-semibold text-zinc-900">
+                        <td className="py-2.5 px-3.5 text-right font-mono font-bold text-slate-900">
                           ${it.total.toFixed(2)}
                         </td>
                       </tr>
@@ -2145,51 +2284,45 @@ Commercial Accounts Team`,
                 </table>
               </div>
 
-              {/* Subtotal and Total Amount Display */}
+              {/* Financial Totals */}
               <div className="flex justify-end">
-                <div className="w-64 border border-zinc-400 bg-white p-3 space-y-1 text-xs">
-                  <div className="flex justify-between text-zinc-600">
+                <div className="w-64 rounded-xl border border-slate-200 bg-white p-4 space-y-1.5 shadow-xs">
+                  <div className="flex justify-between text-slate-600">
                     <span>Subtotal:</span>
-                    <span className="font-mono">${activeGeneratedQuote.subtotal.toFixed(2)}</span>
+                    <span className="font-mono font-semibold text-slate-800">${activeGeneratedQuote.subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-zinc-600">
-                    <span>Tax (0% Trade Exemption):</span>
-                    <span className="font-mono">${activeGeneratedQuote.tax.toFixed(2)}</span>
+                  <div className="flex justify-between text-slate-600">
+                    <span>B2B Wholesale Exemption:</span>
+                    <span className="font-mono text-slate-500">$0.00</span>
                   </div>
-                  <div className="flex justify-between text-zinc-900 font-bold border-t border-zinc-300 pt-1 text-sm">
+                  <div className="flex justify-between text-slate-900 font-bold border-t border-slate-100 pt-2 text-sm">
                     <span>Total Amount:</span>
-                    <span className="font-mono">${activeGeneratedQuote.total.toFixed(2)}</span>
+                    <span className="font-mono text-blue-600 text-base">${activeGeneratedQuote.total.toFixed(2)}</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Simple Document Footer Note */}
-              <div className="border-t border-dashed border-zinc-400 pt-2 text-[10px] text-zinc-500 flex justify-between">
-                <span>Auto-generated by AutoParts SaaS AI Quotation Engine</span>
-                <span>Page 1 of 1</span>
               </div>
             </div>
 
             {/* Modal Actions Bar (Download PDF & Edit Quote + Draft Email with AI) */}
-            <div className="p-3 bg-zinc-100 flex flex-wrap items-center justify-between gap-2">
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 {/* Action 1: Edit Quote */}
                 <button
                   type="button"
                   onClick={handleEditQuote}
-                  className="px-3 py-1.5 border border-zinc-400 bg-white text-zinc-800 text-xs font-semibold hover:bg-zinc-200 flex items-center gap-1.5"
+                  className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-100 shadow-xs flex items-center gap-1.5 transition-colors"
                 >
-                  <Edit3 size={13} />
+                  <Edit3 size={13} className="text-slate-500" />
                   <span>Edit Quote</span>
                 </button>
 
-                {/* Action 2: Download PDF */}
+                {/* Action 2: Download Real PDF */}
                 <button
                   type="button"
                   onClick={() => handleDownloadPDF(activeGeneratedQuote)}
-                  className="px-3 py-1.5 border border-zinc-400 bg-white text-zinc-800 text-xs font-semibold hover:bg-zinc-200 flex items-center gap-1.5"
+                  className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-100 shadow-xs flex items-center gap-1.5 transition-colors"
                 >
-                  <Download size={13} />
+                  <Download size={13} className="text-slate-500" />
                   <span>Download PDF</span>
                 </button>
               </div>
@@ -2203,7 +2336,7 @@ Commercial Accounts Team`,
                     setIsQuotePreviewModalOpen(false);
                     setCurrentScreen('quotes');
                   }}
-                  className="px-3 py-1.5 border border-zinc-400 text-zinc-700 text-xs hover:bg-zinc-200"
+                  className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-white transition-colors"
                 >
                   Save & Close
                 </button>
@@ -2211,9 +2344,9 @@ Commercial Accounts Team`,
                 <button
                   type="button"
                   onClick={() => handleOpenDraftEmail(activeGeneratedQuote)}
-                  className="px-3 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-bold hover:bg-zinc-800 flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm flex items-center gap-1.5 transition-all"
                 >
-                  <Sparkles size={13} />
+                  <Sparkles size={13} className="text-blue-200" />
                   <span>Draft Email with AI →</span>
                 </button>
               </div>
@@ -2224,29 +2357,36 @@ Commercial Accounts Team`,
 
       {/* AI FEATURE 2: AI EMAIL & COMMUNICATION ASSISTANT MODAL */}
       {isEmailModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="w-full max-w-xl bg-white border-2 border-zinc-900 shadow-none my-8">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
             {/* Modal Header */}
-            <div className="p-3 bg-zinc-200 border-b border-zinc-400 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Mail size={15} className="text-zinc-800" />
-                <span className="font-bold text-xs uppercase tracking-wider text-zinc-900">
-                  [ AI Email & Communication Assistant ]
-                </span>
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <Mail size={15} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900">
+                    AI Communication Assistant
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Automated client email composition with attached PDF quotation
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsEmailModalOpen(false)}
-                className="p-1 hover:bg-zinc-300 text-zinc-700"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             </div>
 
             {/* Email Composition Form */}
-            <div className="p-4 space-y-3 text-xs">
+            <div className="p-6 space-y-4 text-xs">
               {/* To (customer email) */}
               <div>
-                <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
+                <label className="block text-slate-700 font-semibold mb-1 text-xs">
                   To (Customer Email):
                 </label>
                 <div className="flex items-center gap-2">
@@ -2254,80 +2394,84 @@ Commercial Accounts Team`,
                     type="email"
                     value={emailTo}
                     onChange={(e) => setEmailTo(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-zinc-400 bg-zinc-50 font-mono text-zinc-900 focus:outline-none focus:border-zinc-900"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/50 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white text-xs transition-all"
                   />
-                  <span className="text-[10px] text-zinc-500 whitespace-nowrap bg-zinc-200 px-2 py-1 border border-zinc-300">
-                    Verified Contact
+                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200 whitespace-nowrap">
+                    Verified
                   </span>
                 </div>
               </div>
 
               {/* Subject (automatically generated) */}
               <div>
-                <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
-                  Subject (Automatically Generated):
+                <label className="block text-slate-700 font-semibold mb-1 text-xs">
+                  Subject Line:
                 </label>
                 <input
                   type="text"
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
-                  className="w-full px-2.5 py-1.5 border border-zinc-400 bg-zinc-50 font-mono text-zinc-900 focus:outline-none focus:border-zinc-900"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/50 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white text-xs transition-all"
                 />
               </div>
 
               {/* Quotation attachment card */}
               <div>
-                <label className="block text-zinc-700 font-bold mb-1 uppercase text-[10px]">
+                <label className="block text-slate-700 font-semibold mb-1 text-xs">
                   Quotation Attachment:
                 </label>
-                <div className="p-2 border border-zinc-400 bg-zinc-100 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Paperclip size={13} className="text-zinc-600" />
-                    <span className="font-mono font-bold text-zinc-900">
-                      Quotation_{attachedQuoteId || 'Q-104'}.pdf
-                    </span>
-                    <span className="text-[10px] text-zinc-500">(42 KB • Generated Estimate)</span>
+                <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-[10px]">
+                      PDF
+                    </div>
+                    <div>
+                      <div className="font-semibold text-slate-900 font-mono">
+                        Quotation_{attachedQuoteId || 'Q-104'}.pdf
+                      </div>
+                      <div className="text-[11px] text-slate-400">42 KB • Official certified estimate</div>
+                    </div>
                   </div>
-                  <span className="text-[10px] bg-white border border-zinc-300 px-1.5 py-0.5 text-zinc-700 uppercase font-bold">
-                    Attached
+                  <span className="text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Check size={11} /> Attached
                   </span>
                 </div>
               </div>
 
               {/* AI Instruction Input Field: "What would you like to communicate?" */}
-              <div className="p-3 border border-zinc-300 bg-zinc-50 space-y-2">
-                <label className="block text-zinc-800 font-bold uppercase text-[10px] flex items-center justify-between">
+              <div className="p-3.5 rounded-xl border border-indigo-100 bg-indigo-50/40 space-y-2">
+                <label className="block text-slate-900 font-bold text-xs flex items-center justify-between">
                   <span>What would you like to communicate?</span>
-                  <span className="text-[9px] text-zinc-500 font-normal">Optional prompt guidance</span>
+                  <span className="text-[10px] text-indigo-600 font-medium">Prompt Guidance</span>
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={emailInstruction}
                     onChange={(e) => setEmailInstruction(e.target.value)}
-                    placeholder="e.g. Include 5% volume discount, mention 24h dispatch, or ask for purchase order"
-                    className="flex-1 px-2.5 py-1.5 border border-zinc-400 bg-white placeholder:text-zinc-400 text-xs focus:outline-none focus:border-zinc-900"
+                    placeholder="e.g. Include 5% volume discount, mention 24h express dispatch, or net terms"
+                    className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white placeholder:text-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                   />
                   {/* Button named "Generate Email" */}
                   <button
                     type="button"
                     onClick={handleGenerateEmailWithInstruction}
-                    className="px-3 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-bold hover:bg-zinc-800 flex items-center gap-1 whitespace-nowrap"
+                    className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 whitespace-nowrap transition-colors"
                   >
-                    <Sparkles size={12} />
+                    <Sparkles size={13} />
                     <span>Generate Email</span>
                   </button>
                 </div>
 
-                {/* Quick chip suggestions */}
-                <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 pt-0.5 flex-wrap">
-                  <span className="font-bold">Try prompt:</span>
+                {/* Quick prompt chips */}
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 pt-0.5 flex-wrap">
+                  <span className="font-medium">Quick chips:</span>
                   <button
                     type="button"
                     onClick={() => {
                       setEmailInstruction('Offer 5% discount if approved by end of this week');
                     }}
-                    className="underline hover:text-zinc-900"
+                    className="text-indigo-600 hover:text-indigo-800 underline"
                   >
                     "5% discount this week"
                   </button>
@@ -2337,48 +2481,48 @@ Commercial Accounts Team`,
                     onClick={() => {
                       setEmailInstruction('Mention free courier dispatch for shop replenishment');
                     }}
-                    className="underline hover:text-zinc-900"
+                    className="text-indigo-600 hover:text-indigo-800 underline"
                   >
                     "Free courier delivery"
                   </button>
                 </div>
               </div>
 
-              {/* Email Body (Professionally written by AI) */}
+              {/* Email Body */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-zinc-700 font-bold uppercase text-[10px]">
-                    Email Body (Professionally Written by AI):
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-slate-700 font-semibold text-xs">
+                    Email Body (Professionally Drafted by AI):
                   </label>
-                  <span className="text-[10px] text-zinc-500 font-mono">Editable Draft</span>
+                  <span className="text-[10px] text-slate-400">Directly editable draft</span>
                 </div>
                 <textarea
                   rows={8}
                   value={emailBody}
                   onChange={(e) => setEmailBody(e.target.value)}
-                  className="w-full p-2.5 border border-zinc-400 bg-white font-mono text-xs leading-relaxed text-zinc-900 focus:outline-none focus:border-zinc-900"
+                  className="w-full p-3.5 rounded-xl border border-slate-200 bg-white text-xs leading-relaxed text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all font-mono"
                 />
               </div>
 
               {/* Modal Actions: Regenerate and Send Email */}
-              <div className="pt-3 border-t border-zinc-300 flex items-center justify-between">
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setIsEmailModalOpen(false)}
-                  className="px-3 py-1.5 border border-zinc-400 text-zinc-700 text-xs hover:bg-zinc-100"
+                  className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   {/* Action 1: Regenerate */}
                   <button
                     type="button"
                     onClick={handleRegenerateEmail}
-                    className="px-3 py-1.5 border border-zinc-400 bg-white text-zinc-800 text-xs font-semibold hover:bg-zinc-100 flex items-center gap-1.5"
+                    className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 shadow-xs flex items-center gap-1.5 transition-colors"
                     title="Cycle through alternative AI drafted variations"
                   >
-                    <RefreshCw size={12} />
+                    <RefreshCw size={13} className="text-slate-500" />
                     <span>Regenerate</span>
                   </button>
 
@@ -2386,9 +2530,9 @@ Commercial Accounts Team`,
                   <button
                     type="button"
                     onClick={handleSendEmail}
-                    className="px-4 py-1.5 bg-zinc-900 text-white border border-zinc-900 text-xs font-bold hover:bg-zinc-800 flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm flex items-center gap-1.5 transition-all"
                   >
-                    <Send size={12} />
+                    <Send size={13} />
                     <span>Send Email</span>
                   </button>
                 </div>
