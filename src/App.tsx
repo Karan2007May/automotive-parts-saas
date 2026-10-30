@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import {
   LayoutDashboard,
@@ -13,6 +13,7 @@ import {
   ClipboardList,
   Search,
   Plus,
+  Minus,
   ArrowRight,
   Check,
   X,
@@ -34,14 +35,14 @@ import {
   Phone,
   ShieldCheck,
   Layers,
-  SlidersHorizontal,
-  Box,
   Truck,
-  DollarSign
+  Sun,
+  Moon
 } from 'lucide-react';
 
 // Type definitions
 type Screen = 'dashboard' | 'inventory' | 'customers' | 'quotes' | 'work-orders';
+type Theme = 'light' | 'dark';
 
 interface Part {
   id: string;
@@ -256,6 +257,26 @@ const INITIAL_WORK_ORDERS: WorkOrder[] = [
 ];
 
 export default function App() {
+  // Theme State: Light / Dark Mode
+  const [theme, setTheme] = useState<Theme>(() => {
+    try {
+      const saved = localStorage.getItem('autoparts_theme');
+      return saved === 'dark' ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  const toggleTheme = () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    try {
+      localStorage.setItem('autoparts_theme', next);
+    } catch {
+      // ignore
+    }
+  };
+
   const [currentScreen, setCurrentScreen] = useState<Screen>('dashboard');
   const [parts, setParts] = useState<Part[]>(INITIAL_PARTS);
   const [customers] = useState<Customer[]>(INITIAL_CUSTOMERS);
@@ -297,6 +318,8 @@ export default function App() {
   const [emailVariation, setEmailVariation] = useState(0);
   const [attachedQuoteId, setAttachedQuoteId] = useState('');
   const [emailSentNotice, setEmailSentNotice] = useState<string | null>(null);
+
+  const isDark = theme === 'dark';
 
   // Helper: Add part to inventory
   const handleAddPart = (e: React.FormEvent) => {
@@ -885,9 +908,13 @@ AutoParts Pro Logistics`,
   ];
 
   return (
-    <div className="flex h-screen w-screen bg-slate-50 text-slate-900 font-sans antialiased overflow-hidden">
+    <div className={`flex h-screen w-screen font-sans antialiased overflow-hidden transition-colors duration-200 ${
+      isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+    }`}>
       {/* SLEEK MODERN DARK NAVY SIDEBAR */}
-      <aside className="w-64 flex-shrink-0 bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col justify-between">
+      <aside className={`w-64 flex-shrink-0 border-r flex flex-col justify-between transition-colors ${
+        isDark ? 'bg-[#090e17] text-slate-300 border-slate-800' : 'bg-slate-900 text-slate-300 border-slate-800'
+      }`}>
         <div className="flex flex-col">
           {/* Brand Header */}
           <div className="h-16 px-5 border-b border-slate-800/80 flex items-center justify-between">
@@ -1034,8 +1061,23 @@ AutoParts Pro Logistics`,
           </div>
         </div>
 
-        {/* User Profile & Demo Controls */}
-        <div className="p-3 border-t border-slate-800 bg-slate-900/90">
+        {/* User Profile & Theme Toggle */}
+        <div className="p-3 border-t border-slate-800 bg-slate-900/90 space-y-2">
+          {/* Theme Switcher Button */}
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-xs text-slate-300 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              {isDark ? <Moon size={14} className="text-blue-400" /> : <Sun size={14} className="text-amber-400" />}
+              <span>Theme: <strong className="text-white capitalize">{theme}</strong></span>
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
+              Switch to {isDark ? 'Light' : 'Dark'}
+            </span>
+          </button>
+
+          {/* Profile Card */}
           <div className="flex items-center justify-between p-2 rounded-lg bg-slate-800/50 border border-slate-700/40">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white font-semibold flex items-center justify-center text-xs shadow-inner">
@@ -1058,42 +1100,76 @@ AutoParts Pro Logistics`,
       </aside>
 
       {/* MAIN VIEWPORT */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+      <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-colors ${
+        isDark ? 'bg-slate-950' : 'bg-slate-50'
+      }`}>
         {/* TOP ENTERPRISE HEADER */}
-        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between flex-shrink-0 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+        <header className={`h-16 border-b px-8 flex items-center justify-between flex-shrink-0 transition-colors ${
+          isDark 
+            ? 'bg-slate-900/90 border-slate-800 shadow-[0_1px_2px_rgba(0,0,0,0.4)]' 
+            : 'bg-white border-slate-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.02)]'
+        }`}>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-slate-500">
-              <span className="font-semibold text-slate-900 capitalize text-base tracking-tight">
+              <span className={`font-semibold capitalize text-base tracking-tight ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>
                 {currentScreen.replace('-', ' ')}
               </span>
               <span>/</span>
-              <span className="text-xs font-medium text-slate-500">Commercial Portal</span>
+              <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Commercial Portal
+              </span>
             </div>
           </div>
 
-          {/* Stepper Interactive Navigation */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-lg border border-slate-200">
-            {workflowSteps.map((step, idx) => {
-              const isActive = currentScreen === step.id;
-              return (
-                <React.Fragment key={step.id}>
-                  <button
-                    onClick={() => setCurrentScreen(step.id as Screen)}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
-                      isActive
-                        ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                    }`}
-                  >
-                    <span className="text-[10px] text-slate-400 font-mono">{step.step}</span>
-                    <span>{step.label}</span>
-                  </button>
-                  {idx < workflowSteps.length - 1 && (
-                    <ChevronRight size={12} className="text-slate-400" />
-                  )}
-                </React.Fragment>
-              );
-            })}
+          <div className="flex items-center gap-3">
+            {/* Quick Header Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors ${
+                isDark
+                  ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
+                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100 shadow-xs'
+              }`}
+              title={`Switch to ${isDark ? 'Light' : 'Dark'} mode`}
+            >
+              {isDark ? <Sun size={14} className="text-amber-400" /> : <Moon size={14} className="text-slate-600" />}
+              <span className="hidden sm:inline text-[11px]">{isDark ? 'Light' : 'Dark'}</span>
+            </button>
+
+            {/* Stepper Interactive Navigation */}
+            <div className={`flex items-center gap-1 p-1 rounded-lg border transition-colors ${
+              isDark ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-200'
+            }`}>
+              {workflowSteps.map((step, idx) => {
+                const isActive = currentScreen === step.id;
+                return (
+                  <React.Fragment key={step.id}>
+                    <button
+                      onClick={() => setCurrentScreen(step.id as Screen)}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                        isActive
+                          ? isDark
+                            ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                            : 'bg-white text-slate-900 shadow-sm font-semibold'
+                          : isDark
+                          ? 'text-slate-400 hover:text-white hover:bg-slate-700/60'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      }`}
+                    >
+                      <span className={`text-[10px] font-mono ${isActive ? 'opacity-80' : 'opacity-50'}`}>
+                        {step.step}
+                      </span>
+                      <span>{step.label}</span>
+                    </button>
+                    {idx < workflowSteps.length - 1 && (
+                      <ChevronRight size={12} className={isDark ? 'text-slate-600' : 'text-slate-400'} />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
           </div>
         </header>
 
@@ -1122,14 +1198,16 @@ AutoParts Pro Logistics`,
         )}
 
         {pdfDownloadedNotice && (
-          <div className="bg-emerald-50 text-emerald-900 px-8 py-2.5 border-b border-emerald-200 text-xs flex items-center justify-between shadow-sm">
+          <div className={`px-8 py-2.5 border-b text-xs flex items-center justify-between shadow-sm transition-colors ${
+            isDark ? 'bg-emerald-950/60 text-emerald-200 border-emerald-800' : 'bg-emerald-50 text-emerald-900 border-emerald-200'
+          }`}>
             <div className="flex items-center gap-2.5">
-              <FileDown size={15} className="text-emerald-700" />
+              <FileDown size={15} className="text-emerald-400" />
               <span className="font-medium">{pdfDownloadedNotice}</span>
             </div>
             <button
               onClick={() => setPdfDownloadedNotice(null)}
-              className="text-emerald-700 hover:text-emerald-900 p-0.5"
+              className="text-emerald-400 hover:text-emerald-200 p-0.5"
             >
               <X size={13} />
             </button>
@@ -1142,12 +1220,14 @@ AutoParts Pro Logistics`,
           {currentScreen === 'dashboard' && (
             <div className="max-w-6xl mx-auto space-y-6">
               {/* Header Title & Primary Action */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+              <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b ${
+                isDark ? 'border-slate-800' : 'border-slate-200/80'
+              }`}>
                 <div>
-                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                  <h1 className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     Operations Overview
                   </h1>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Live catalog telemetry, active quotation pipelines, and dispatch fulfillment status.
                   </p>
                 </div>
@@ -1164,7 +1244,11 @@ AutoParts Pro Logistics`,
                   </button>
                   <button
                     onClick={() => setCurrentScreen('inventory')}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-sm transition-all"
+                    className={`flex items-center gap-1.5 px-3.5 py-2 border rounded-lg text-xs font-medium shadow-sm transition-all ${
+                      isDark
+                        ? 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700'
+                        : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                    }`}
                   >
                     <span>Browse Inventory</span>
                     <ArrowRight size={13} className="text-slate-400" />
@@ -1175,29 +1259,39 @@ AutoParts Pro Logistics`,
               {/* Modern Summary Metric Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {/* Metric 1: Total Parts */}
-                <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm hover:border-slate-300 transition-all">
+                <div className={`rounded-xl border p-5 shadow-sm transition-all ${
+                  isDark
+                    ? 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
+                    : 'bg-white border-slate-200/80 hover:border-slate-300'
+                }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500">Total Cataloged Parts</span>
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <span className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Total Cataloged Parts
+                    </span>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      isDark ? 'bg-blue-950/60 text-blue-400 border border-blue-800/40' : 'bg-blue-50 text-blue-600'
+                    }`}>
                       <Package size={16} />
                     </div>
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
-                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                    <span className={`text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {parts.length}
                     </span>
-                    <span className="text-xs font-medium text-emerald-600 flex items-center gap-0.5">
+                    <span className="text-xs font-medium text-emerald-500 flex items-center gap-0.5">
                       <TrendingUp size={12} /> +12% active
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     {parts.reduce((acc, p) => acc + p.stock, 0)} total units across warehouse bays
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className={`mt-4 pt-3 border-t flex items-center justify-between text-xs ${
+                    isDark ? 'border-slate-800' : 'border-slate-100'
+                  }`}>
                     <span className="text-slate-400">All SKUs in stock</span>
                     <button
                       onClick={() => setCurrentScreen('inventory')}
-                      className="text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1"
+                      className="text-blue-500 font-medium hover:text-blue-400 flex items-center gap-1"
                     >
                       Manage items <ChevronRight size={13} />
                     </button>
@@ -1205,32 +1299,42 @@ AutoParts Pro Logistics`,
                 </div>
 
                 {/* Metric 2: Pending Quotes */}
-                <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm hover:border-slate-300 transition-all">
+                <div className={`rounded-xl border p-5 shadow-sm transition-all ${
+                  isDark
+                    ? 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
+                    : 'bg-white border-slate-200/80 hover:border-slate-300'
+                }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500">Pending Quotations</span>
-                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <span className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Pending Quotations
+                    </span>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      isDark ? 'bg-amber-950/60 text-amber-400 border border-amber-800/40' : 'bg-amber-50 text-amber-600'
+                    }`}>
                       <FileText size={16} />
                     </div>
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
-                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                    <span className={`text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {quotes.filter((q) => q.status === 'Pending').length || 1}
                     </span>
-                    <span className="text-xs font-medium text-slate-500">
+                    <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                       of {quotes.length} total
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-1 font-mono">
+                  <div className={`text-xs mt-1 font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     ${quotes
                       .reduce((acc, q) => acc + q.amount, 0)
                       .toLocaleString('en-US', { minimumFractionDigits: 2 })}{' '}
                     total pipeline value
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className={`mt-4 pt-3 border-t flex items-center justify-between text-xs ${
+                    isDark ? 'border-slate-800' : 'border-slate-100'
+                  }`}>
                     <span className="text-slate-400">AI email drafting ready</span>
                     <button
                       onClick={() => setCurrentScreen('quotes')}
-                      className="text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1"
+                      className="text-blue-500 font-medium hover:text-blue-400 flex items-center gap-1"
                     >
                       View quotes <ChevronRight size={13} />
                     </button>
@@ -1238,29 +1342,39 @@ AutoParts Pro Logistics`,
                 </div>
 
                 {/* Metric 3: Open Orders */}
-                <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm hover:border-slate-300 transition-all">
+                <div className={`rounded-xl border p-5 shadow-sm transition-all ${
+                  isDark
+                    ? 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
+                    : 'bg-white border-slate-200/80 hover:border-slate-300'
+                }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500">Active Work Orders</span>
-                    <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <span className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Active Work Orders
+                    </span>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      isDark ? 'bg-indigo-950/60 text-indigo-400 border border-indigo-800/40' : 'bg-indigo-50 text-indigo-600'
+                    }`}>
                       <ClipboardList size={16} />
                     </div>
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
-                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                    <span className={`text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {workOrders.filter((w) => w.status !== 'Completed').length}
                     </span>
-                    <span className="text-xs font-medium text-blue-600">
+                    <span className="text-xs font-medium text-blue-500">
                       In Fulfillment
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Ready for shop courier pickup or dispatch
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className={`mt-4 pt-3 border-t flex items-center justify-between text-xs ${
+                    isDark ? 'border-slate-800' : 'border-slate-100'
+                  }`}>
                     <span className="text-slate-400">100% on-time rate</span>
                     <button
                       onClick={() => setCurrentScreen('work-orders')}
-                      className="text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1"
+                      className="text-blue-500 font-medium hover:text-blue-400 flex items-center gap-1"
                     >
                       Dispatch queue <ChevronRight size={13} />
                     </button>
@@ -1269,35 +1383,47 @@ AutoParts Pro Logistics`,
               </div>
 
               {/* AI Automation Feature Cards */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm">
-                <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+              <div className={`rounded-xl border p-6 shadow-sm transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
+                <div className={`flex items-center justify-between pb-4 mb-4 border-b ${
+                  isDark ? 'border-slate-800' : 'border-slate-100'
+                }`}>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                      isDark ? 'bg-indigo-950/60 text-indigo-400 border border-indigo-800/40' : 'bg-indigo-50 text-indigo-600'
+                    }`}>
                       <Sparkles size={15} />
                     </div>
                     <div>
-                      <h2 className="text-sm font-bold text-slate-900">
+                      <h2 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                         Intelligent Quoting & Communication Suite
                       </h2>
-                      <p className="text-xs text-slate-500">
+                      <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                         Accelerate commercial sales workflows with automatic estimate calculation and B2B email drafting.
                       </p>
                     </div>
                   </div>
-                  <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
+                  <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-md border ${
+                    isDark ? 'bg-indigo-950/60 text-indigo-300 border-indigo-800/50' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
+                  }`}>
                     Commercial Tools
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl border border-slate-200/70 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                  <div className={`p-4 rounded-xl border transition-colors ${
+                    isDark
+                      ? 'border-slate-800 bg-slate-950/50 hover:bg-slate-950/80'
+                      : 'border-slate-200/70 bg-slate-50/50 hover:bg-slate-50'
+                  }`}>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-900">
+                      <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                         1. Automated Quotation Preparation
                       </span>
                       <span className="text-[10px] text-slate-500 font-mono">Real PDF Export</span>
                     </div>
-                    <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                    <p className={`text-xs mt-1.5 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                       Select inventory items to instantly compute lines, unit margins, and client details, then download a certified PDF estimate.
                     </p>
                     <button
@@ -1305,25 +1431,29 @@ AutoParts Pro Logistics`,
                         setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                         setIsCreateQuoteModalOpen(true);
                       }}
-                      className="mt-3 text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                      className="mt-3 text-xs font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1"
                     >
                       Launch Quote Generator <ArrowRight size={12} />
                     </button>
                   </div>
 
-                  <div className="p-4 rounded-xl border border-slate-200/70 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                  <div className={`p-4 rounded-xl border transition-colors ${
+                    isDark
+                      ? 'border-slate-800 bg-slate-950/50 hover:bg-slate-950/80'
+                      : 'border-slate-200/70 bg-slate-50/50 hover:bg-slate-50'
+                  }`}>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-900">
+                      <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                         2. AI Communication Assistant
                       </span>
                       <span className="text-[10px] text-slate-500 font-mono">1-Click Dispatch</span>
                     </div>
-                    <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                    <p className={`text-xs mt-1.5 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                       Drafts tailored client messages with attached PDF quotes, incorporating custom discounts or urgency terms seamlessly.
                     </p>
                     <button
                       onClick={() => handleOpenEmailFromQuoteRow(quotes[0])}
-                      className="mt-3 text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                      className="mt-3 text-xs font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1"
                     >
                       Open Email Assistant <ArrowRight size={12} />
                     </button>
@@ -1332,48 +1462,58 @@ AutoParts Pro Logistics`,
               </div>
 
               {/* Polished Recent Activity Table */}
-              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className={`rounded-xl border shadow-sm overflow-hidden transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
+                <div className={`px-5 py-4 border-b flex items-center justify-between ${
+                  isDark ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50/50 border-slate-100'
+                }`}>
                   <div className="flex items-center gap-2">
                     <Clock size={15} className="text-slate-400" />
-                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                    <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       Recent System Activity
                     </span>
                   </div>
                   <span className="text-xs text-slate-400">Live operational ledger</span>
                 </div>
-                <div className="divide-y divide-slate-100 text-xs">
-                  <div className="px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition-colors">
+                <div className={`divide-y text-xs ${isDark ? 'divide-slate-800' : 'divide-slate-100'}`}>
+                  <div className={`px-5 py-3.5 flex items-center justify-between transition-colors ${
+                    isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50/60'
+                  }`}>
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-emerald-500" />
                       <div>
-                        <span className="font-semibold text-slate-900">Work Order WO-501</span>
-                        <span className="text-slate-600"> marked Ready for Pickup for Metro Auto Repair Center</span>
+                        <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Work Order WO-501</span>
+                        <span className={isDark ? 'text-slate-400' : 'text-slate-600'}> marked Ready for Pickup for Metro Auto Repair Center</span>
                       </div>
                     </div>
-                    <span className="text-slate-400 font-mono text-[11px]">Today, 09:15 AM</span>
+                    <span className="text-slate-500 font-mono text-[11px]">Today, 09:15 AM</span>
                   </div>
 
-                  <div className="px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition-colors">
+                  <div className={`px-5 py-3.5 flex items-center justify-between transition-colors ${
+                    isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50/60'
+                  }`}>
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-blue-500" />
                       <div>
-                        <span className="font-semibold text-slate-900">Quote Q-102</span>
-                        <span className="text-slate-600"> ($1,260.00) sent to Apex Fleet Logistics via AI Assistant</span>
+                        <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Quote Q-102</span>
+                        <span className={isDark ? 'text-slate-400' : 'text-slate-600'}> ($1,260.00) sent to Apex Fleet Logistics via AI Assistant</span>
                       </div>
                     </div>
-                    <span className="text-slate-400 font-mono text-[11px]">Today, 08:30 AM</span>
+                    <span className="text-slate-500 font-mono text-[11px]">Today, 08:30 AM</span>
                   </div>
 
-                  <div className="px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/60 transition-colors">
+                  <div className={`px-5 py-3.5 flex items-center justify-between transition-colors ${
+                    isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50/60'
+                  }`}>
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-amber-500" />
                       <div>
-                        <span className="font-semibold text-slate-900">Inventory Alert</span>
-                        <span className="text-slate-600"> Alternator 120A reached low stock threshold (6 units remaining)</span>
+                        <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Inventory Alert</span>
+                        <span className={isDark ? 'text-slate-400' : 'text-slate-600'}> Alternator 120A reached low stock threshold (6 units remaining)</span>
                       </div>
                     </div>
-                    <span className="text-slate-400 font-mono text-[11px]">Yesterday, 04:45 PM</span>
+                    <span className="text-slate-500 font-mono text-[11px]">Yesterday, 04:45 PM</span>
                   </div>
                 </div>
               </div>
@@ -1384,21 +1524,27 @@ AutoParts Pro Logistics`,
           {currentScreen === 'inventory' && (
             <div className="max-w-6xl mx-auto space-y-5">
               {/* Screen Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+              <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b ${
+                isDark ? 'border-slate-800' : 'border-slate-200/80'
+              }`}>
                 <div>
-                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                  <h1 className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     Parts Inventory Catalog
                   </h1>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Manage SKU inventory levels, warehouse bin coordinates, and wholesale trade pricing.
                   </p>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <button
                     onClick={() => setIsAddPartModalOpen(true)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold shadow-sm transition-all"
+                    className={`flex items-center gap-1.5 px-3.5 py-2 border rounded-lg text-xs font-semibold shadow-sm transition-all ${
+                      isDark
+                        ? 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700'
+                        : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                    }`}
                   >
-                    <Plus size={14} className="text-slate-500" />
+                    <Plus size={14} className="text-slate-400" />
                     <span>Add Part</span>
                   </button>
                   <button
@@ -1414,8 +1560,10 @@ AutoParts Pro Logistics`,
                 </div>
               </div>
 
-              {/* Controls bar: Modern Search & Count */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-3.5 shadow-sm flex items-center justify-between gap-4">
+              {/* Controls bar: Search & Count */}
+              <div className={`rounded-xl border p-3.5 shadow-sm flex items-center justify-between gap-4 transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
                 <div className="flex-1 max-w-md relative">
                   <Search
                     size={15}
@@ -1426,19 +1574,27 @@ AutoParts Pro Logistics`,
                     value={inventorySearch}
                     onChange={(e) => setInventorySearch(e.target.value)}
                     placeholder="Search by part name, SKU number, or shelf location..."
-                    className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white transition-all"
+                    className={`w-full pl-9 pr-4 py-2 text-xs rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                      isDark
+                        ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500 focus:bg-slate-800'
+                        : 'bg-slate-50/60 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white'
+                    }`}
                   />
                 </div>
-                <div className="text-xs text-slate-500 flex items-center gap-2">
-                  <span>Showing <strong className="text-slate-900">{filteredParts.length}</strong> of {parts.length} cataloged SKUs</span>
+                <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'} flex items-center gap-2`}>
+                  <span>Showing <strong className={isDark ? 'text-white' : 'text-slate-900'}>{filteredParts.length}</strong> of {parts.length} cataloged SKUs</span>
                 </div>
               </div>
 
-              {/* Polished Parts Table */}
-              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+              {/* Parts Table */}
+              <div className={`rounded-xl border shadow-sm overflow-hidden transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] tracking-wider">
+                    <tr className={`border-b font-semibold uppercase text-[11px] tracking-wider transition-colors ${
+                      isDark ? 'bg-slate-800/50 border-slate-800 text-slate-400' : 'bg-slate-50/75 border-slate-200 text-slate-500'
+                    }`}>
                       <th className="py-3 px-4">Part Name & Category</th>
                       <th className="py-3 px-4">SKU / Part Number</th>
                       <th className="py-3 px-4 text-right">Stock Level</th>
@@ -1447,22 +1603,26 @@ AutoParts Pro Logistics`,
                       <th className="py-3 px-4 text-center">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className={`divide-y ${isDark ? 'divide-slate-800/80' : 'divide-slate-100'}`}>
                     {filteredParts.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="py-12 text-center text-slate-400">
+                        <td colSpan={6} className="py-12 text-center text-slate-500">
                           No matching components found for "{inventorySearch}".
                         </td>
                       </tr>
                     ) : (
                       filteredParts.map((part) => (
-                        <tr key={part.id} className="hover:bg-slate-50/70 transition-colors">
+                        <tr key={part.id} className={`transition-colors ${
+                          isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/70'
+                        }`}>
                           <td className="py-3.5 px-4">
-                            <div className="font-semibold text-slate-900">{part.name}</div>
-                            <div className="text-[11px] text-slate-400 mt-0.5">{part.category || 'Automotive Component'}</div>
+                            <div className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{part.name}</div>
+                            <div className="text-[11px] text-slate-500 mt-0.5">{part.category || 'Automotive Component'}</div>
                           </td>
-                          <td className="py-3.5 px-4 font-mono font-medium text-slate-600">
-                            <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+                          <td className="py-3.5 px-4 font-mono font-medium">
+                            <span className={`px-2 py-0.5 rounded border text-[11px] ${
+                              isDark ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-200'
+                            }`}>
                               {part.number}
                             </span>
                           </td>
@@ -1470,27 +1630,33 @@ AutoParts Pro Logistics`,
                             <span
                               className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                                 part.stock < 10
-                                  ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  ? isDark ? 'bg-amber-950/50 text-amber-300 border border-amber-800/50' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                  : isDark ? 'bg-emerald-950/50 text-emerald-300 border border-emerald-800/50' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               }`}
                             >
                               <span className={`w-1.5 h-1.5 rounded-full ${part.stock < 10 ? 'bg-amber-500' : 'bg-emerald-500'}`} />
                               {part.stock} in stock
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 text-right font-semibold text-slate-900 font-mono">
+                          <td className={`py-3.5 px-4 text-right font-semibold font-mono ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             ${part.price.toFixed(2)}
                           </td>
-                          <td className="py-3.5 px-4 text-slate-600 font-medium">
+                          <td className={`py-3.5 px-4 font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                             {part.location}
                           </td>
                           <td className="py-3.5 px-4 text-center">
                             <button
                               onClick={() => handleOpenQuoteWithPart(part)}
-                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-200 transition-colors"
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-colors ${
+                                isDark
+                                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 hover:border-slate-600'
+                                  : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border-slate-200 hover:border-blue-200'
+                              }`}
                               title="Start quotation with this part"
                             >
-                              <Sparkles size={12} className="text-blue-600" />
+                              <Sparkles size={12} className="text-blue-500" />
                               <span>Quote</span>
                             </button>
                           </td>
@@ -1502,8 +1668,10 @@ AutoParts Pro Logistics`,
               </div>
 
               {/* Workflow callout footer */}
-              <div className="p-4 bg-white rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between text-xs">
-                <span className="text-slate-600">
+              <div className={`p-4 rounded-xl border shadow-sm flex items-center justify-between text-xs transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
+                <span className={isDark ? 'text-slate-300' : 'text-slate-600'}>
                   <strong>Workflow Next Step:</strong> Select a customer and inventory parts to trigger <strong>"Generate Quote with AI"</strong>.
                 </span>
                 <button
@@ -1511,7 +1679,7 @@ AutoParts Pro Logistics`,
                     setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                     setIsCreateQuoteModalOpen(true);
                   }}
-                  className="font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                  className="font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1"
                 >
                   Open Quote Generator <ArrowRight size={13} />
                 </button>
@@ -1523,47 +1691,57 @@ AutoParts Pro Logistics`,
           {currentScreen === 'customers' && (
             <div className="max-w-6xl mx-auto space-y-5">
               {/* Screen Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+              <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b ${
+                isDark ? 'border-slate-800' : 'border-slate-200/80'
+              }`}>
                 <div>
-                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                  <h1 className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     Workshop & Fleet Customers
                   </h1>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Commercial client accounts, service garages, and authorized workshop contacts.
                   </p>
                 </div>
-                <div className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 shadow-sm">
+                <div className={`text-xs font-semibold px-3 py-1.5 rounded-lg border shadow-sm ${
+                  isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-600'
+                }`}>
                   {customers.length} Accounts Enrolled
                 </div>
               </div>
 
               {/* Customer Table */}
-              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <div className={`rounded-xl border shadow-sm overflow-hidden transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] tracking-wider">
+                    <tr className={`border-b font-semibold uppercase text-[11px] tracking-wider transition-colors ${
+                      isDark ? 'bg-slate-800/50 border-slate-800 text-slate-400' : 'bg-slate-50/75 border-slate-200 text-slate-500'
+                    }`}>
                       <th className="py-3 px-4">Contact Representative</th>
                       <th className="py-3 px-4">Company / Garage</th>
                       <th className="py-3 px-4">Contact Details & Email</th>
                       <th className="py-3 px-4 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className={`divide-y ${isDark ? 'divide-slate-800/80' : 'divide-slate-100'}`}>
                     {customers.map((c) => (
-                      <tr key={c.id} className="hover:bg-slate-50/70 transition-colors">
+                      <tr key={c.id} className={`transition-colors ${
+                        isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/70'
+                      }`}>
                         <td className="py-3.5 px-4">
-                          <div className="font-semibold text-slate-900">{c.name}</div>
-                          <div className="text-[11px] text-slate-400">Account Owner</div>
+                          <div className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{c.name}</div>
+                          <div className="text-[11px] text-slate-500">Account Owner</div>
                         </td>
                         <td className="py-3.5 px-4">
-                          <div className="font-medium text-slate-800 flex items-center gap-1.5">
-                            <Building2 size={13} className="text-slate-400" />
+                          <div className={`font-medium flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                            <Building2 size={13} className="text-slate-500" />
                             <span>{c.company}</span>
                           </div>
                         </td>
                         <td className="py-3.5 px-4">
-                          <div className="text-slate-600 font-medium">{c.email}</div>
-                          <div className="text-[11px] text-slate-400 font-mono mt-0.5">{c.phone}</div>
+                          <div className={`font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{c.email}</div>
+                          <div className="text-[11px] text-slate-500 font-mono mt-0.5">{c.phone}</div>
                         </td>
                         <td className="py-3.5 px-4 text-center">
                           <button
@@ -1572,7 +1750,11 @@ AutoParts Pro Logistics`,
                               setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                               setIsCreateQuoteModalOpen(true);
                             }}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-colors"
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-colors ${
+                              isDark
+                                ? 'bg-blue-950/60 hover:bg-blue-900/60 text-blue-300 border-blue-800/50'
+                                : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200'
+                            }`}
                           >
                             <Sparkles size={12} />
                             <span>AI Quote</span>
@@ -1584,8 +1766,10 @@ AutoParts Pro Logistics`,
                 </table>
               </div>
 
-              <div className="p-4 rounded-xl border border-slate-200/70 bg-white text-xs text-slate-500 shadow-sm flex items-center gap-3">
-                <ShieldCheck size={18} className="text-blue-600 flex-shrink-0" />
+              <div className={`p-4 rounded-xl border text-xs shadow-sm flex items-center gap-3 transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800 text-slate-400' : 'bg-white border-slate-200/70 text-slate-500'
+              }`}>
+                <ShieldCheck size={18} className="text-blue-500 flex-shrink-0" />
                 <span>
                   All client email addresses are pre-verified for direct B2B automated PDF transmission through the AI Email & Communication Assistant.
                 </span>
@@ -1597,12 +1781,14 @@ AutoParts Pro Logistics`,
           {currentScreen === 'quotes' && (
             <div className="max-w-6xl mx-auto space-y-5">
               {/* Screen Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+              <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b ${
+                isDark ? 'border-slate-800' : 'border-slate-200/80'
+              }`}>
                 <div>
-                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                  <h1 className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     Quotations & Commercial Pipeline
                   </h1>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Manage parts quotations, generate real PDF documents, and draft client communications.
                   </p>
                 </div>
@@ -1619,10 +1805,14 @@ AutoParts Pro Logistics`,
               </div>
 
               {/* Quotations Table */}
-              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <div className={`rounded-xl border shadow-sm overflow-hidden transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] tracking-wider">
+                    <tr className={`border-b font-semibold uppercase text-[11px] tracking-wider transition-colors ${
+                      isDark ? 'bg-slate-800/50 border-slate-800 text-slate-400' : 'bg-slate-50/75 border-slate-200 text-slate-500'
+                    }`}>
                       <th className="py-3 px-4">Quote ID</th>
                       <th className="py-3 px-4">Client Customer</th>
                       <th className="py-3 px-4">Parts Summary</th>
@@ -1631,32 +1821,36 @@ AutoParts Pro Logistics`,
                       <th className="py-3 px-4 text-center">Actions & Flow</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className={`divide-y ${isDark ? 'divide-slate-800/80' : 'divide-slate-100'}`}>
                     {quotes.map((q) => (
-                      <tr key={q.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
-                          <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+                      <tr key={q.id} className={`transition-colors ${
+                        isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/70'
+                      }`}>
+                        <td className="py-3.5 px-4 font-mono font-bold">
+                          <span className={`px-2 py-0.5 rounded border text-[11px] ${
+                            isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-slate-100 text-slate-800 border-slate-200'
+                          }`}>
                             {q.id}
                           </span>
                         </td>
                         <td className="py-3.5 px-4">
-                          <div className="font-semibold text-slate-900">{q.customerName}</div>
-                          <div className="text-[11px] text-slate-400 font-mono">{q.customerEmail}</div>
+                          <div className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{q.customerName}</div>
+                          <div className="text-[11px] text-slate-500 font-mono">{q.customerEmail}</div>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-600 font-medium">
+                        <td className={`py-3.5 px-4 font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                           {q.itemsSummary}
                         </td>
-                        <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900">
+                        <td className={`py-3.5 px-4 text-right font-mono font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           ${q.amount.toFixed(2)}
                         </td>
                         <td className="py-3.5 px-4 text-center">
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                               q.status === 'Approved'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                ? isDark ? 'bg-emerald-950/50 text-emerald-300 border border-emerald-800/50' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : q.status === 'Pending'
-                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                : 'bg-slate-100 text-slate-600 border border-slate-200'
+                                ? isDark ? 'bg-amber-950/50 text-amber-300 border border-amber-800/50' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                : isDark ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-slate-100 text-slate-600 border border-slate-200'
                             }`}
                           >
                             <span
@@ -1676,17 +1870,25 @@ AutoParts Pro Logistics`,
                             {/* Download Real PDF */}
                             <button
                               onClick={() => handleDownloadPDFFromQuoteRow(q)}
-                              className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs flex items-center gap-1 transition-colors"
+                              className={`px-2.5 py-1.5 rounded-md text-xs font-semibold border shadow-xs flex items-center gap-1 transition-colors ${
+                                isDark
+                                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                              }`}
                               title="Download official PDF quotation document"
                             >
-                              <Download size={12} className="text-slate-500" />
+                              <Download size={12} className="text-slate-400" />
                               <span>PDF</span>
                             </button>
 
                             {/* Draft Email with AI */}
                             <button
                               onClick={() => handleOpenEmailFromQuoteRow(q)}
-                              className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center gap-1 transition-colors"
+                              className={`px-2.5 py-1.5 rounded-md text-xs font-semibold border flex items-center gap-1 transition-colors ${
+                                isDark
+                                  ? 'bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border-indigo-800/50'
+                                  : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200'
+                              }`}
                               title="Draft Email with AI for this quotation"
                             >
                               <Mail size={12} />
@@ -1712,7 +1914,11 @@ AutoParts Pro Logistics`,
                                     )
                                   );
                                 }}
-                                className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-200 transition-colors"
+                                className={`px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-colors ${
+                                  isDark
+                                    ? 'bg-slate-800 hover:bg-emerald-950/50 text-slate-300 hover:text-emerald-300 border-slate-700 hover:border-emerald-700'
+                                    : 'bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border-slate-200 hover:border-emerald-200'
+                                }`}
                               >
                                 Approve
                               </button>
@@ -1726,13 +1932,15 @@ AutoParts Pro Logistics`,
               </div>
 
               {/* Workflow callout footer */}
-              <div className="p-4 bg-white rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between text-xs">
-                <span className="text-slate-600">
+              <div className={`p-4 rounded-xl border shadow-sm flex items-center justify-between text-xs transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
+                <span className={isDark ? 'text-slate-300' : 'text-slate-600'}>
                   <strong>Workflow Next Step:</strong> Approved quotes can be converted into active Work Orders for workshop warehouse fulfillment.
                 </span>
                 <button
                   onClick={() => setCurrentScreen('work-orders')}
-                  className="font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                  className="font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1"
                 >
                   View Work Orders Screen <ArrowRight size={13} />
                 </button>
@@ -1744,25 +1952,33 @@ AutoParts Pro Logistics`,
           {currentScreen === 'work-orders' && (
             <div className="max-w-6xl mx-auto space-y-5">
               {/* Screen Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+              <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b ${
+                isDark ? 'border-slate-800' : 'border-slate-200/80'
+              }`}>
                 <div>
-                  <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                  <h1 className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     Workshop Orders & Dispatch Queue
                   </h1>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Fulfillment tracking, order dispatch status, and client workshop collection.
                   </p>
                 </div>
-                <div className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 shadow-sm">
+                <div className={`text-xs font-semibold px-3 py-1.5 rounded-lg border shadow-sm ${
+                  isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-600'
+                }`}>
                   {workOrders.length} Total Orders
                 </div>
               </div>
 
               {/* Work Orders Table */}
-              <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <div className={`rounded-xl border shadow-sm overflow-hidden transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] tracking-wider">
+                    <tr className={`border-b font-semibold uppercase text-[11px] tracking-wider transition-colors ${
+                      isDark ? 'bg-slate-800/50 border-slate-800 text-slate-400' : 'bg-slate-50/75 border-slate-200 text-slate-500'
+                    }`}>
                       <th className="py-3 px-4">Order ID</th>
                       <th className="py-3 px-4">Client Customer</th>
                       <th className="py-3 px-4">Parts Assigned</th>
@@ -1771,28 +1987,32 @@ AutoParts Pro Logistics`,
                       <th className="py-3 px-4 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className={`divide-y ${isDark ? 'divide-slate-800/80' : 'divide-slate-100'}`}>
                     {workOrders.map((wo) => (
-                      <tr key={wo.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
-                          <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+                      <tr key={wo.id} className={`transition-colors ${
+                        isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/70'
+                      }`}>
+                        <td className="py-3.5 px-4 font-mono font-bold">
+                          <span className={`px-2 py-0.5 rounded border text-[11px] ${
+                            isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-slate-100 text-slate-800 border-slate-200'
+                          }`}>
                             {wo.id}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 font-semibold text-slate-900">
+                        <td className={`py-3.5 px-4 font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           {wo.customerName}
                         </td>
-                        <td className="py-3.5 px-4 text-slate-600 font-medium">
+                        <td className={`py-3.5 px-4 font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                           {wo.partsSummary}
                         </td>
                         <td className="py-3.5 px-4 text-center">
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                               wo.status === 'Completed'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                ? isDark ? 'bg-emerald-950/50 text-emerald-300 border border-emerald-800/50' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : wo.status === 'In Progress'
-                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                : 'bg-slate-100 text-slate-600 border border-slate-200'
+                                ? isDark ? 'bg-blue-950/50 text-blue-300 border border-blue-800/50' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                : isDark ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-slate-100 text-slate-600 border border-slate-200'
                             }`}
                           >
                             <span
@@ -1811,10 +2031,10 @@ AutoParts Pro Logistics`,
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                               wo.dispatchStatus === 'Dispatched'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                ? isDark ? 'bg-emerald-950/50 text-emerald-300 border border-emerald-800/50' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : wo.dispatchStatus === 'Ready for Pickup'
-                                ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                                : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                ? isDark ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-800/50' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                                : isDark ? 'bg-amber-950/50 text-amber-300 border border-amber-800/50' : 'bg-amber-50 text-amber-700 border border-amber-200'
                             }`}
                           >
                             <Truck size={11} />
@@ -1837,12 +2057,16 @@ AutoParts Pro Logistics`,
                                   )
                                 );
                               }}
-                              className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-colors"
+                              className={`px-3 py-1.5 rounded-md text-xs font-semibold shadow-xs transition-colors ${
+                                isDark
+                                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                  : 'bg-slate-900 hover:bg-slate-800 text-white'
+                              }`}
                             >
                               Dispatch Order
                             </button>
                           ) : (
-                            <span className="text-[11px] text-slate-400 font-medium">
+                            <span className="text-[11px] text-slate-500 font-medium">
                               Fulfilled
                             </span>
                           )}
@@ -1854,19 +2078,23 @@ AutoParts Pro Logistics`,
               </div>
 
               {/* Flow Completion Card */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-3">
-                <div className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-600" />
+              <div className={`rounded-xl border p-5 shadow-sm space-y-3 transition-colors ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}>
+                <div className={`font-bold text-sm flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <CheckCircle2 size={16} className="text-emerald-500" />
                   <span>Complete B2B Workflow Cycle Demonstrated</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   The client has walked through the complete modern B2B SaaS workflow:
                   <strong> Dashboard overview</strong> → <strong>Inventory checking & selection</strong> → <strong>AI Quote Generation & real PDF download</strong> → <strong>AI Email assistant dispatch</strong> → <strong>Work order fulfillment</strong>.
                 </p>
                 <div className="pt-1 flex items-center gap-3">
                   <button
                     onClick={() => setCurrentScreen('dashboard')}
-                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-all"
+                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+                      isDark ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'
+                    }`}
                   >
                     Return to Dashboard
                   </button>
@@ -1875,9 +2103,13 @@ AutoParts Pro Logistics`,
                       setQuoteItems([{ partId: parts[0].id, quantity: 4, unitPrice: parts[0].price }]);
                       setIsCreateQuoteModalOpen(true);
                     }}
-                    className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
+                    className={`px-3.5 py-2 border rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                      isDark
+                        ? 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700'
+                        : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+                    }`}
                   >
-                    <Sparkles size={13} className="text-blue-600" />
+                    <Sparkles size={13} className="text-blue-500" />
                     <span>Generate Another Quote</span>
                   </button>
                 </div>
@@ -1889,17 +2121,23 @@ AutoParts Pro Logistics`,
 
       {/* MODERN MODAL: ADD PART */}
       {isAddPartModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className={`w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden transition-colors ${
+            isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className={`px-6 py-4 border-b flex items-center justify-between ${
+              isDark ? 'bg-slate-850 border-slate-800' : 'bg-slate-50/50 border-slate-100'
+            }`}>
               <div>
-                <h3 className="font-bold text-sm text-slate-900">Add Inventory Part</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Register a new SKU into warehouse stock</p>
+                <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Add Inventory Part</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Register a new SKU into warehouse stock</p>
               </div>
               <button
                 onClick={() => setIsAddPartModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                }`}
               >
                 <X size={15} />
               </button>
@@ -1908,7 +2146,7 @@ AutoParts Pro Logistics`,
             {/* Modal Form */}
             <form onSubmit={handleAddPart} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                <label className={`block font-semibold mb-1.5 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   Part Name:
                 </label>
                 <input
@@ -1917,13 +2155,17 @@ AutoParts Pro Logistics`,
                   value={newPartName}
                   onChange={(e) => setNewPartName(e.target.value)}
                   placeholder="e.g. Radiator Assembly 2.0L Turbo"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white placeholder:text-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                  className={`w-full px-3 py-2 rounded-lg border text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium ${
+                    isDark
+                      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
+                      : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400'
+                  }`}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                  <label className={`block font-semibold mb-1.5 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                     Part Number / SKU:
                   </label>
                   <input
@@ -1932,11 +2174,15 @@ AutoParts Pro Logistics`,
                     value={newPartNumber}
                     onChange={(e) => setNewPartNumber(e.target.value)}
                     placeholder="e.g. RAD-3310"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white placeholder:text-slate-400 text-xs uppercase font-mono focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                    className={`w-full px-3 py-2 rounded-lg border text-xs uppercase font-mono font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
+                        : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                  <label className={`block font-semibold mb-1.5 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                     Warehouse Location:
                   </label>
                   <input
@@ -1944,14 +2190,18 @@ AutoParts Pro Logistics`,
                     value={newPartLocation}
                     onChange={(e) => setNewPartLocation(e.target.value)}
                     placeholder="e.g. Shelf B-02"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white placeholder:text-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                    className={`w-full px-3 py-2 rounded-lg border text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
+                        : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400'
+                    }`}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                  <label className={`block font-semibold mb-1.5 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                     Initial Stock Count:
                   </label>
                   <input
@@ -1959,11 +2209,15 @@ AutoParts Pro Logistics`,
                     min="0"
                     value={newPartStock}
                     onChange={(e) => setNewPartStock(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                    className={`w-full px-3 py-2 rounded-lg border text-xs font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-white'
+                        : 'bg-white border-slate-200 text-slate-900'
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                  <label className={`block font-semibold mb-1.5 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                     Wholesale Price ($):
                   </label>
                   <input
@@ -1972,16 +2226,24 @@ AutoParts Pro Logistics`,
                     min="0"
                     value={newPartPrice}
                     onChange={(e) => setNewPartPrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                    className={`w-full px-3 py-2 rounded-lg border text-xs font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-white'
+                        : 'bg-white border-slate-200 text-slate-900'
+                    }`}
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex justify-end gap-2.5">
+              <div className={`pt-3 border-t flex justify-end gap-2.5 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                 <button
                   type="button"
                   onClick={() => setIsAddPartModalOpen(false)}
-                  className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors"
+                  className={`px-3.5 py-2 rounded-lg border text-xs font-semibold transition-colors ${
+                    isDark
+                      ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
+                      : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                  }`}
                 >
                   Cancel
                 </button>
@@ -1997,24 +2259,30 @@ AutoParts Pro Logistics`,
         </div>
       )}
 
-      {/* MODERN MODAL: CREATE QUOTE (WITH "GENERATE QUOTE WITH AI") */}
+      {/* MODERN MODAL: CREATE QUOTE (WITH "GENERATE QUOTE WITH AI" & VISIBLE QUANTITIES) */}
       {isCreateQuoteModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className={`w-full max-w-xl rounded-2xl shadow-2xl border overflow-hidden transition-colors ${
+            isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div className={`px-6 py-4 border-b flex items-center justify-between ${
+              isDark ? 'bg-slate-850 border-slate-800' : 'bg-slate-50/50 border-slate-100'
+            }`}>
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center">
                   <Sparkles size={14} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900">Create Quotation</h3>
-                  <p className="text-xs text-slate-500">Configure client parts with AI assistance</p>
+                  <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Create Quotation</h3>
+                  <p className="text-xs text-slate-400">Configure client parts with AI assistance</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsCreateQuoteModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                }`}
               >
                 <X size={15} />
               </button>
@@ -2024,100 +2292,159 @@ AutoParts Pro Logistics`,
             <form onSubmit={handleSaveStandardQuote} className="p-6 space-y-4 text-xs">
               {/* Customer Selector */}
               <div>
-                <label className="block text-slate-700 font-semibold mb-1.5 text-xs">
+                <label className={`block font-semibold mb-1.5 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   1. Select Client Workshop:
                 </label>
                 <select
                   value={quoteCustomerId}
                   onChange={(e) => setQuoteCustomerId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all font-medium text-slate-900"
+                  className={`w-full px-3 py-2 rounded-lg border text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium ${
+                    isDark
+                      ? 'bg-slate-800 border-slate-700 text-white'
+                      : 'bg-white border-slate-200 text-slate-900'
+                  }`}
                 >
                   {customers.map((c) => (
-                    <option key={c.id} value={c.id}>
+                    <option key={c.id} value={c.id} className={isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}>
                       {c.company} — {c.name} ({c.email})
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Inventory Parts Selector & Quantities */}
+              {/* Inventory Parts Selector & Prominently Visible Quantities */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-slate-700 font-semibold text-xs">
+                  <label className={`block font-semibold text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                     2. Select Line Items & Quantities:
                   </label>
                   <button
                     type="button"
                     onClick={handleAddQuoteLineItem}
-                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                    className="text-xs font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1"
                   >
                     <Plus size={12} /> Add Item Line
                   </button>
                 </div>
 
-                <div className="space-y-2 border border-slate-200 rounded-xl p-3 bg-slate-50/50">
+                <div className={`space-y-2 border rounded-xl p-3 ${
+                  isDark ? 'border-slate-800 bg-slate-950/60' : 'border-slate-200 rounded-xl p-3 bg-slate-50/50'
+                }`}>
                   {quoteItems.map((qi, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
+                    <div key={idx} className={`p-2.5 rounded-lg border flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 ${
+                      isDark ? 'border-slate-800 bg-slate-900/90' : 'border-slate-200 bg-white'
+                    }`}>
+                      {/* Part Selector */}
                       <select
                         value={qi.partId}
                         onChange={(e) => handleUpdateQuoteLineItem(idx, 'partId', e.target.value)}
-                        className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 font-medium"
+                        className={`flex-1 px-3 py-2 text-xs rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium ${
+                          isDark
+                            ? 'bg-slate-800 border-slate-700 text-white'
+                            : 'bg-white border-slate-200 text-slate-900'
+                        }`}
                       >
                         {parts.map((p) => (
-                          <option key={p.id} value={p.id}>
+                          <option key={p.id} value={p.id} className={isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}>
                             {p.name} ({p.number}) — ${p.price.toFixed(2)} [Stock: {p.stock}]
                           </option>
                         ))}
                       </select>
 
-                      <div className="w-16">
-                        <input
-                          type="number"
-                          min="1"
-                          title="Quantity"
-                          value={qi.quantity}
-                          onChange={(e) => handleUpdateQuoteLineItem(idx, 'quantity', e.target.value)}
-                          className="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-center font-mono font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/20"
-                        />
-                      </div>
+                      <div className="flex items-center justify-between sm:justify-end gap-3 flex-shrink-0">
+                        {/* HIGHLY VISIBLE QUANTITY CONTROLLER (FIXED ISSUE) */}
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[11px] font-semibold uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                            Qty:
+                          </span>
+                          <div className={`flex items-center border rounded-lg overflow-hidden shadow-xs ${
+                            isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-300 bg-white'
+                          }`}>
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateQuoteLineItem(idx, 'quantity', String(Math.max(1, qi.quantity - 1)))}
+                              className={`px-2 py-1.5 transition-colors ${
+                                isDark
+                                  ? 'text-slate-300 hover:text-white hover:bg-slate-700'
+                                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                              }`}
+                              title="Decrease quantity"
+                            >
+                              <Minus size={12} />
+                            </button>
+                            <input
+                              type="number"
+                              min="1"
+                              title="Adjust Quantity"
+                              value={qi.quantity}
+                              onChange={(e) => handleUpdateQuoteLineItem(idx, 'quantity', e.target.value)}
+                              className={`w-12 text-center text-xs font-bold font-mono py-1 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                                isDark ? 'text-white bg-slate-800' : 'text-slate-900 bg-white'
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateQuoteLineItem(idx, 'quantity', String(qi.quantity + 1))}
+                              className={`px-2 py-1.5 transition-colors ${
+                                isDark
+                                  ? 'text-slate-300 hover:text-white hover:bg-slate-700'
+                                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                              }`}
+                              title="Increase quantity"
+                            >
+                              <Plus size={12} />
+                            </button>
+                          </div>
+                        </div>
 
-                      <div className="w-20 text-right font-mono font-bold text-slate-900 text-xs">
-                        ${(qi.quantity * qi.unitPrice).toFixed(2)}
-                      </div>
+                        {/* Line Total */}
+                        <div className={`w-20 text-right font-mono font-bold text-xs ${
+                          isDark ? 'text-white' : 'text-slate-900'
+                        }`}>
+                          ${(qi.quantity * qi.unitPrice).toFixed(2)}
+                        </div>
 
-                      {quoteItems.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveQuoteLineItem(idx)}
-                          className="p-1 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                          title="Remove line item"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      )}
+                        {/* Remove item button */}
+                        {quoteItems.length > 1 ? (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveQuoteLineItem(idx)}
+                            className="p-1.5 rounded-md text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            title="Remove line item"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        ) : (
+                          <div className="w-7" />
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Financial Calculation Summary Card */}
-              <div className="rounded-xl border border-slate-200/90 bg-slate-50/80 p-4 space-y-1.5 text-xs">
-                <div className="flex justify-between text-slate-600">
+              <div className={`rounded-xl border p-4 space-y-1.5 text-xs ${
+                isDark ? 'border-slate-800 bg-slate-950/70' : 'border-slate-200/90 bg-slate-50/80'
+              }`}>
+                <div className={`flex justify-between ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   <span>Subtotal Amount:</span>
-                  <span className="font-mono font-semibold text-slate-800">
+                  <span className={`font-mono font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                     $
                     {quoteItems
                       .reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
                       .toFixed(2)}
                   </span>
                 </div>
-                <div className="flex justify-between text-slate-600">
+                <div className={`flex justify-between ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   <span>B2B Wholesale Trade Exemption:</span>
                   <span className="font-mono text-slate-500">$0.00</span>
                 </div>
-                <div className="flex justify-between text-slate-900 font-bold border-t border-slate-200 pt-2 text-sm">
+                <div className={`flex justify-between font-bold border-t pt-2 text-sm ${
+                  isDark ? 'border-slate-800 text-white' : 'border-slate-200 text-slate-900'
+                }`}>
                   <span>Total Estimate:</span>
-                  <span className="font-mono text-blue-600 text-base">
+                  <span className="font-mono text-blue-500 text-base">
                     $
                     {quoteItems
                       .reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
@@ -2126,12 +2453,18 @@ AutoParts Pro Logistics`,
                 </div>
               </div>
 
-              {/* ACTION BUTTONS (INCLUDES "GENERATE QUOTE WITH AI") */}
-              <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+              {/* ACTION BUTTONS */}
+              <div className={`pt-3 border-t flex flex-col sm:flex-row items-center justify-between gap-3 ${
+                isDark ? 'border-slate-800' : 'border-slate-100'
+              }`}>
                 <button
                   type="button"
                   onClick={() => setIsCreateQuoteModalOpen(false)}
-                  className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors w-full sm:w-auto"
+                  className={`px-3.5 py-2 rounded-lg border text-xs font-semibold transition-colors w-full sm:w-auto ${
+                    isDark
+                      ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
+                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
                 >
                   Cancel
                 </button>
@@ -2139,12 +2472,15 @@ AutoParts Pro Logistics`,
                 <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
                   <button
                     type="submit"
-                    className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 shadow-xs transition-colors"
+                    className={`px-3.5 py-2 rounded-lg border text-xs font-semibold shadow-xs transition-colors ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
+                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
                   >
                     Save Standard Quote
                   </button>
 
-                  {/* Primary Feature 1 Button */}
                   <button
                     type="button"
                     onClick={handleGenerateQuoteWithAI}
@@ -2161,80 +2497,96 @@ AutoParts Pro Logistics`,
         </div>
       )}
 
-      {/* AI FEATURE 1: GENERATED QUOTATION PREVIEW MODAL (REALISTIC PDF SHEET) */}
+      {/* AI FEATURE 1: GENERATED QUOTATION PREVIEW MODAL */}
       {isQuotePreviewModalOpen && activeGeneratedQuote && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className={`w-full max-w-2xl rounded-2xl shadow-2xl border overflow-hidden my-8 transition-colors ${
+            isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
             {/* Modal Top Control Bar */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+            <div className={`px-6 py-4 border-b flex items-center justify-between ${
+              isDark ? 'bg-slate-850 border-slate-800' : 'bg-slate-50/60 border-slate-100'
+            }`}>
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center">
                   <Sparkles size={14} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900">Quotation Preview</h3>
-                  <p className="text-xs text-slate-500">Official certified PDF format preview</p>
+                  <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Quotation Preview</h3>
+                  <p className="text-xs text-slate-400">Official certified PDF format preview</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsQuotePreviewModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                }`}
               >
                 <X size={15} />
               </button>
             </div>
 
             {/* Document PDF Sheet Simulation */}
-            <div className="p-8 bg-slate-50/40 text-xs text-slate-800 space-y-6">
+            <div className={`p-8 text-xs space-y-6 ${
+              isDark ? 'bg-slate-950/50 text-slate-200' : 'bg-slate-50/40 text-slate-800'
+            }`}>
               {/* Document Header */}
-              <div className="border-b border-slate-200 pb-5 flex justify-between items-start">
+              <div className={`border-b pb-5 flex justify-between items-start ${
+                isDark ? 'border-slate-800' : 'border-slate-200'
+              }`}>
                 <div>
-                  <div className="font-bold text-base tracking-tight text-slate-900 uppercase">
+                  <div className={`font-bold text-base tracking-tight uppercase ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     AUTOPARTS PRO B2B SAAS
                   </div>
-                  <div className="text-[11px] text-slate-500 mt-1">
+                  <div className="text-[11px] text-slate-400 mt-1">
                     100 Industrial Parkway, Warehouse Bay 4 • (555) 019-2830
                   </div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-[11px] text-slate-400">
                     support@autopartspro.io • Tax ID: US-8829-1092
                   </div>
                 </div>
-                <div className="text-right p-3 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <div className={`text-right p-3 rounded-xl border shadow-xs ${
+                  isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                }`}>
                   <div className="text-[10px] uppercase font-bold text-slate-400">
                     Official Quotation
                   </div>
-                  <div className="text-sm font-bold text-slate-900 font-mono mt-0.5">
+                  <div className={`text-sm font-bold font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {activeGeneratedQuote.quoteId}
                   </div>
-                  <div className="text-[11px] text-slate-500 mt-1">
+                  <div className="text-[11px] text-slate-400 mt-1">
                     Date: {activeGeneratedQuote.date}
                   </div>
-                  <div className="text-[11px] text-slate-400">
+                  <div className="text-[11px] text-slate-500">
                     Valid: {activeGeneratedQuote.validUntil}
                   </div>
                 </div>
               </div>
 
               {/* Customer Details Box */}
-              <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <div className={`grid grid-cols-2 gap-4 p-4 rounded-xl border shadow-xs ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200'
+              }`}>
                 <div>
                   <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">
                     Prepared For (Customer Details):
                   </div>
-                  <div className="font-bold text-slate-900 text-sm">
+                  <div className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {activeGeneratedQuote.customer.company}
                   </div>
-                  <div className="text-slate-700 mt-0.5">
+                  <div className={`mt-0.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     Attn: {activeGeneratedQuote.customer.name}
                   </div>
-                  <div className="text-slate-500 mt-0.5">
+                  <div className="text-slate-400 mt-0.5">
                     {activeGeneratedQuote.customer.email}
                   </div>
-                  <div className="text-slate-500 font-mono text-[11px]">
+                  <div className="text-slate-400 font-mono text-[11px]">
                     {activeGeneratedQuote.customer.phone}
                   </div>
                 </div>
-                <div className="border-l border-slate-100 pl-4 space-y-1 text-slate-600 text-xs">
+                <div className={`border-l pl-4 space-y-1 text-xs ${
+                  isDark ? 'border-slate-800 text-slate-300' : 'border-slate-100 text-slate-600'
+                }`}>
                   <div className="text-[10px] font-bold uppercase text-slate-400">
                     Commercial Terms:
                   </div>
@@ -2245,10 +2597,14 @@ AutoParts Pro Logistics`,
               </div>
 
               {/* Parts Description Table */}
-              <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+              <div className={`rounded-xl border overflow-hidden shadow-xs ${
+                isDark ? 'border-slate-800 bg-slate-900/90' : 'border-slate-200 bg-white'
+              }`}>
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px] tracking-wider">
+                    <tr className={`border-b font-semibold uppercase text-[10px] tracking-wider ${
+                      isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50/80 border-slate-200 text-slate-500'
+                    }`}>
                       <th className="py-2.5 px-3.5">#</th>
                       <th className="py-2.5 px-3.5">Parts Description</th>
                       <th className="py-2.5 px-3.5">Part Number</th>
@@ -2257,25 +2613,25 @@ AutoParts Pro Logistics`,
                       <th className="py-2.5 px-3.5 text-right">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className={`divide-y ${isDark ? 'divide-slate-800' : 'divide-slate-100'}`}>
                     {activeGeneratedQuote.items.map((it, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/50">
-                        <td className="py-2.5 px-3.5 text-slate-400 font-mono">
+                      <tr key={idx} className={isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50/50'}>
+                        <td className="py-2.5 px-3.5 text-slate-500 font-mono">
                           {idx + 1}
                         </td>
-                        <td className="py-2.5 px-3.5 font-semibold text-slate-900">
+                        <td className={`py-2.5 px-3.5 font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           {it.partName}
                         </td>
-                        <td className="py-2.5 px-3.5 font-mono text-slate-600">
+                        <td className="py-2.5 px-3.5 font-mono text-slate-400">
                           {it.partNumber}
                         </td>
-                        <td className="py-2.5 px-3.5 text-right font-medium text-slate-900">
+                        <td className={`py-2.5 px-3.5 text-right font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           {it.quantity}
                         </td>
-                        <td className="py-2.5 px-3.5 text-right font-mono text-slate-600">
+                        <td className="py-2.5 px-3.5 text-right font-mono text-slate-400">
                           ${it.unitPrice.toFixed(2)}
                         </td>
-                        <td className="py-2.5 px-3.5 text-right font-mono font-bold text-slate-900">
+                        <td className={`py-2.5 px-3.5 text-right font-mono font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           ${it.total.toFixed(2)}
                         </td>
                       </tr>
@@ -2286,48 +2642,61 @@ AutoParts Pro Logistics`,
 
               {/* Financial Totals */}
               <div className="flex justify-end">
-                <div className="w-64 rounded-xl border border-slate-200 bg-white p-4 space-y-1.5 shadow-xs">
-                  <div className="flex justify-between text-slate-600">
+                <div className={`w-64 rounded-xl border p-4 space-y-1.5 shadow-xs ${
+                  isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
+                }`}>
+                  <div className={`flex justify-between ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     <span>Subtotal:</span>
-                    <span className="font-mono font-semibold text-slate-800">${activeGeneratedQuote.subtotal.toFixed(2)}</span>
+                    <span className={`font-mono font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>
+                      ${activeGeneratedQuote.subtotal.toFixed(2)}
+                    </span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className={`flex justify-between ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     <span>B2B Wholesale Exemption:</span>
                     <span className="font-mono text-slate-500">$0.00</span>
                   </div>
-                  <div className="flex justify-between text-slate-900 font-bold border-t border-slate-100 pt-2 text-sm">
+                  <div className={`flex justify-between font-bold border-t pt-2 text-sm ${
+                    isDark ? 'border-slate-800 text-white' : 'border-slate-100 text-slate-900'
+                  }`}>
                     <span>Total Amount:</span>
-                    <span className="font-mono text-blue-600 text-base">${activeGeneratedQuote.total.toFixed(2)}</span>
+                    <span className="font-mono text-blue-500 text-base">${activeGeneratedQuote.total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Modal Actions Bar (Download PDF & Edit Quote + Draft Email with AI) */}
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <div className={`px-6 py-4 border-t flex flex-wrap items-center justify-between gap-3 ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
               <div className="flex items-center gap-2">
-                {/* Action 1: Edit Quote */}
                 <button
                   type="button"
                   onClick={handleEditQuote}
-                  className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-100 shadow-xs flex items-center gap-1.5 transition-colors"
+                  className={`px-3.5 py-2 rounded-lg border text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors ${
+                    isDark
+                      ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700'
+                      : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  <Edit3 size={13} className="text-slate-500" />
+                  <Edit3 size={13} className="text-slate-400" />
                   <span>Edit Quote</span>
                 </button>
 
-                {/* Action 2: Download Real PDF */}
                 <button
                   type="button"
                   onClick={() => handleDownloadPDF(activeGeneratedQuote)}
-                  className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-100 shadow-xs flex items-center gap-1.5 transition-colors"
+                  className={`px-3.5 py-2 rounded-lg border text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors ${
+                    isDark
+                      ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700'
+                      : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  <Download size={13} className="text-slate-500" />
+                  <Download size={13} className="text-slate-400" />
                   <span>Download PDF</span>
                 </button>
               </div>
 
-              {/* Primary Workflow Link: Draft Email with AI */}
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -2336,7 +2705,11 @@ AutoParts Pro Logistics`,
                     setIsQuotePreviewModalOpen(false);
                     setCurrentScreen('quotes');
                   }}
-                  className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-white transition-colors"
+                  className={`px-3.5 py-2 rounded-lg border text-xs font-semibold transition-colors ${
+                    isDark
+                      ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
+                      : 'border-slate-200 text-slate-600 hover:bg-white'
+                  }`}
                 >
                   Save & Close
                 </button>
@@ -2357,26 +2730,32 @@ AutoParts Pro Logistics`,
 
       {/* AI FEATURE 2: AI EMAIL & COMMUNICATION ASSISTANT MODAL */}
       {isEmailModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className={`w-full max-w-xl rounded-2xl shadow-2xl border overflow-hidden my-8 transition-colors ${
+            isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+            <div className={`px-6 py-4 border-b flex items-center justify-between ${
+              isDark ? 'bg-slate-850 border-slate-800' : 'bg-slate-50/60 border-slate-100'
+            }`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
                   <Mail size={15} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900">
+                  <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     AI Communication Assistant
                   </h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-400">
                     Automated client email composition with attached PDF quotation
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsEmailModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                }`}
               >
                 <X size={15} />
               </button>
@@ -2386,7 +2765,7 @@ AutoParts Pro Logistics`,
             <div className="p-6 space-y-4 text-xs">
               {/* To (customer email) */}
               <div>
-                <label className="block text-slate-700 font-semibold mb-1 text-xs">
+                <label className={`block font-semibold mb-1 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   To (Customer Email):
                 </label>
                 <div className="flex items-center gap-2">
@@ -2394,9 +2773,15 @@ AutoParts Pro Logistics`,
                     type="email"
                     value={emailTo}
                     onChange={(e) => setEmailTo(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/50 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white text-xs transition-all"
+                    className={`w-full px-3 py-2 rounded-lg border font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-xs transition-all ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-white'
+                        : 'bg-slate-50/50 border-slate-200 text-slate-900'
+                    }`}
                   />
-                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200 whitespace-nowrap">
+                  <span className={`text-[11px] font-semibold px-2 py-1 rounded-md border whitespace-nowrap ${
+                    isDark ? 'bg-emerald-950/50 text-emerald-300 border-emerald-800/50' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  }`}>
                     Verified
                   </span>
                 </div>
@@ -2404,45 +2789,57 @@ AutoParts Pro Logistics`,
 
               {/* Subject (automatically generated) */}
               <div>
-                <label className="block text-slate-700 font-semibold mb-1 text-xs">
+                <label className={`block font-semibold mb-1 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   Subject Line:
                 </label>
                 <input
                   type="text"
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50/50 font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white text-xs transition-all"
+                  className={`w-full px-3 py-2 rounded-lg border font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-xs transition-all ${
+                    isDark
+                      ? 'bg-slate-800 border-slate-700 text-white'
+                      : 'bg-slate-50/50 border-slate-200 text-slate-900'
+                  }`}
                 />
               </div>
 
               {/* Quotation attachment card */}
               <div>
-                <label className="block text-slate-700 font-semibold mb-1 text-xs">
+                <label className={`block font-semibold mb-1 text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   Quotation Attachment:
                 </label>
-                <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div className={`p-3 rounded-xl border flex items-center justify-between ${
+                  isDark ? 'border-slate-800 bg-slate-950/60' : 'border-slate-200 bg-slate-50'
+                }`}>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-[10px]">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-[10px] ${
+                      isDark ? 'bg-red-950/50 text-red-400 border border-red-800/50' : 'bg-red-50 text-red-600'
+                    }`}>
                       PDF
                     </div>
                     <div>
-                      <div className="font-semibold text-slate-900 font-mono">
+                      <div className={`font-semibold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
                         Quotation_{attachedQuoteId || 'Q-104'}.pdf
                       </div>
                       <div className="text-[11px] text-slate-400">42 KB • Official certified estimate</div>
                     </div>
                   </div>
-                  <span className="text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span className={`text-[11px] font-semibold border px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                    isDark ? 'bg-emerald-950/50 text-emerald-300 border-emerald-800/50' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  }`}>
                     <Check size={11} /> Attached
                   </span>
                 </div>
               </div>
 
-              {/* AI Instruction Input Field: "What would you like to communicate?" */}
-              <div className="p-3.5 rounded-xl border border-indigo-100 bg-indigo-50/40 space-y-2">
-                <label className="block text-slate-900 font-bold text-xs flex items-center justify-between">
+              {/* AI Instruction Input Field */}
+              <div className={`p-3.5 rounded-xl border space-y-2 ${
+                isDark ? 'border-indigo-900/50 bg-indigo-950/20' : 'border-indigo-100 bg-indigo-50/40'
+              }`}>
+                <label className={`block font-bold text-xs flex items-center justify-between ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   <span>What would you like to communicate?</span>
-                  <span className="text-[10px] text-indigo-600 font-medium">Prompt Guidance</span>
+                  <span className="text-[10px] text-indigo-400 font-medium">Prompt Guidance</span>
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -2450,9 +2847,12 @@ AutoParts Pro Logistics`,
                     value={emailInstruction}
                     onChange={(e) => setEmailInstruction(e.target.value)}
                     placeholder="e.g. Include 5% volume discount, mention 24h express dispatch, or net terms"
-                    className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white placeholder:text-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                    className={`flex-1 px-3 py-1.5 rounded-lg border text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
+                        : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400'
+                    }`}
                   />
-                  {/* Button named "Generate Email" */}
                   <button
                     type="button"
                     onClick={handleGenerateEmailWithInstruction}
@@ -2463,15 +2863,14 @@ AutoParts Pro Logistics`,
                   </button>
                 </div>
 
-                {/* Quick prompt chips */}
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 pt-0.5 flex-wrap">
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-400 pt-0.5 flex-wrap">
                   <span className="font-medium">Quick chips:</span>
                   <button
                     type="button"
                     onClick={() => {
                       setEmailInstruction('Offer 5% discount if approved by end of this week');
                     }}
-                    className="text-indigo-600 hover:text-indigo-800 underline"
+                    className="text-indigo-400 hover:text-indigo-300 underline"
                   >
                     "5% discount this week"
                   </button>
@@ -2481,7 +2880,7 @@ AutoParts Pro Logistics`,
                     onClick={() => {
                       setEmailInstruction('Mention free courier dispatch for shop replenishment');
                     }}
-                    className="text-indigo-600 hover:text-indigo-800 underline"
+                    className="text-indigo-400 hover:text-indigo-300 underline"
                   >
                     "Free courier delivery"
                   </button>
@@ -2491,7 +2890,7 @@ AutoParts Pro Logistics`,
               {/* Email Body */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-slate-700 font-semibold text-xs">
+                  <label className={`block font-semibold text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                     Email Body (Professionally Drafted by AI):
                   </label>
                   <span className="text-[10px] text-slate-400">Directly editable draft</span>
@@ -2500,33 +2899,45 @@ AutoParts Pro Logistics`,
                   rows={8}
                   value={emailBody}
                   onChange={(e) => setEmailBody(e.target.value)}
-                  className="w-full p-3.5 rounded-xl border border-slate-200 bg-white text-xs leading-relaxed text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all font-mono"
+                  className={`w-full p-3.5 rounded-xl border text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono ${
+                    isDark
+                      ? 'bg-slate-800 border-slate-700 text-slate-100'
+                      : 'bg-white border-slate-200 text-slate-800'
+                  }`}
                 />
               </div>
 
-              {/* Modal Actions: Regenerate and Send Email */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              {/* Modal Actions */}
+              <div className={`pt-3 border-t flex items-center justify-between ${
+                isDark ? 'border-slate-800' : 'border-slate-100'
+              }`}>
                 <button
                   type="button"
                   onClick={() => setIsEmailModalOpen(false)}
-                  className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors"
+                  className={`px-3.5 py-2 rounded-lg border text-xs font-semibold transition-colors ${
+                    isDark
+                      ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
+                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
                 >
                   Cancel
                 </button>
 
                 <div className="flex items-center gap-2.5">
-                  {/* Action 1: Regenerate */}
                   <button
                     type="button"
                     onClick={handleRegenerateEmail}
-                    className="px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 shadow-xs flex items-center gap-1.5 transition-colors"
+                    className={`px-3.5 py-2 rounded-lg border text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors ${
+                      isDark
+                        ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                    }`}
                     title="Cycle through alternative AI drafted variations"
                   >
-                    <RefreshCw size={13} className="text-slate-500" />
+                    <RefreshCw size={13} className="text-slate-400" />
                     <span>Regenerate</span>
                   </button>
 
-                  {/* Action 2: Send Email */}
                   <button
                     type="button"
                     onClick={handleSendEmail}
