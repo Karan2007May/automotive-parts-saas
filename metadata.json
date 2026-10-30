@@ -1,0 +1,6 @@
+{
+  "name": "AutoParts Wireframe Prototype",
+  "description": "Low-fidelity wireframe prototype for an Automotive Parts Inventory and Quoting SaaS platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
